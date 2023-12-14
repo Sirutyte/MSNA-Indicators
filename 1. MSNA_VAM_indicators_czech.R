@@ -1,5 +1,3 @@
-#Hi Irma, this is a test
-
 ## Clear environment, if needed
 rm(list = ls())
 setwd("/Users/irmasirutyte/Desktop/MSNA Composite/MSNA_updated_czech")
