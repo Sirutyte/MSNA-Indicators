@@ -1160,6 +1160,7 @@ df_selected <- df_ind %>%
 
 view(df_selected)
 
+
 # write_xlsx(df_ind, "check_inactive_youth.xlsx", col_names = TRUE)
 
 # ------------------------------------------------------------------------------
