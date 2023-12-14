@@ -440,14 +440,11 @@ df_ind <- df_ind %>%
 unemployed_sum <- sum(df_ind$unemployed, na.rm = TRUE)
 labour_force_total <- sum(df_ind$labour_force, na.rm = TRUE)
 
-outcome13_3_unemployment <- unemployed_sum / labour_force_total
-print(outcome13_3_unemployment)
+df_ind <- df_ind %>%
+  mutate(outcome13_3_unemployment = unemployed_sum / labour_force_total)
 
-
-#df_selected <- df_ind %>%
-#  select(DR.11_NUM_AGE, SE2_SS_WORK, SE3_SS_BUSINESS, SE4_SS_FAM_BUSINESS, SE5_SS_HELP_FAM_BUSINESS, SE6_SS_TRY_FIND_JOB, SE7_SS_START_WORK_IN_2_WKS, employed, unemployed, labour_force)
-#view(df_selected)
-
+mean_outcome13_3_unemployment <- mean(df_ind$outcome13_3_unemployment, na.rm = TRUE)
+print(mean_outcome13_3_unemployment)
 
 write_xlsx(df_ind, "RMS/final_individual_indicators.xlsx", col_names=TRUE)
 
@@ -1163,16 +1160,7 @@ df_selected <- df_ind %>%
 
 view(df_selected)
 
-
-write_xlsx(df_ind, "check_inactive_youth.xlsx", col_names = TRUE)
-
-
-# is.na(employed) |  is.na(E1_SS_ATT_EDU) |  is.na(SE8_SS_ACTIVITY) & (DR.11_NUM_AGE > 15 & DR.11_NUM_AGE <= 24) ~ NA_real_,
-# (E1_SS_ATT_EDU == "PreferNotAnswer" & SE8_SS_ACTIVITY == "PreferNotAnswer") & is.na(employed) & (DR.11_NUM_AGE > 15 & DR.11_NUM_AGE <= 24) ~ NA_real_,
-# (E1_SS_ATT_EDU == "DoNotKnow" & SE8_SS_ACTIVITY == "DoNotKnow") & is.na(employed) & (DR.11_NUM_AGE > 15 & DR.11_NUM_AGE <= 24) ~ NA_real_,
-# TRUE ~ 0
-
-# is.na(employed) | is.na(SE6_SS_TRY_FIND_JOB) | is.na(SE7_SS_START_WORK_IN_2_WKS) ~ NA_real_,
+# write_xlsx(df_ind, "check_inactive_youth.xlsx", col_names = TRUE)
 
 # ------------------------------------------------------------------------------
 # % of HH paying rent without financial distress
@@ -1233,15 +1221,10 @@ result_pressure_to_leave <- data.frame(
 print(result_pressure_to_leave)
 
 
-
 # ------------------------------------------------------------------------------
-# ------------------------------------------------------------------------------
-# END - OTHER INDICATORS FOR FACTBOOK !!!
-# ------------------------------------------------------------------------------
+# Age category
 # ------------------------------------------------------------------------------
 
-## -----------------------------------------------------------------------------
-# Age category adults only
 
 df_hh$DR7.3_NUM_RESP_AGE <- as.numeric(as.character(df_hh$DR7.3_NUM_RESP_AGE))
 
@@ -1313,16 +1296,10 @@ df_ind_full <- left_join(df_ind_export, df_ind_vam,
                                "_parent_index" = "_parent_index"))
 
 
-view(df_ind_full)
-
-# write.xlsx(df_ind_full, "Combined/ind_combined_indicators.xlsx", sheetName = "Sheet1", colNames = TRUE, col_labels= TRUE)
-
 
 # ------------------------------------------------------------------------------
-# ADD OTHER INDICATORS 
+# Disability on household level
 # ------------------------------------------------------------------------------
-
-### 1. Disability on household level
 
 df_ind_full$disability <- as.numeric(as.character(df_ind_full$disability))
 
@@ -1349,16 +1326,14 @@ pivot_table_summary <- pivot_table_summary %>%
 
 print(pivot_table_summary)
 
-### 2. Households with children
+
+# ------------------------------------------------------------------------------
+# Households with children
+# ------------------------------------------------------------------------------
 
 # Create a dummy of individual level: 
 
 df_ind_full$DR.11_NUM_AGE <- as.numeric(as.character(df_ind_full$DR.11_NUM_AGE))
-
-#  df_ind <- df_ind %>%
-#  mutate(employed = case_when(
-#  SE2_SS_WORK	== "yes" & (DR.11_NUM_AGE > 15 & DR.11_NUM_AGE < 65) ~ 1,
-
 
 df_ind_full <- df_ind_full %>%
     mutate(tag_child = case_when(
@@ -1384,13 +1359,8 @@ pivot_table_summary_child <- pivot_table_summary_child %>%
                                               'HH with children'),
                               levels = c(0, 1)))
 
-print(pivot_table_summary_child)
+# print(pivot_table_summary_child)
 
-
-
-
-# df_ind_full <- left_join(df_ind_full, pivot_table_summary,
-#                         by = c("parent_index" = "parent_index"))
 
 # df_ind_full <- left_join(df_ind_full, pivot_table_summary_child,
 #                          by = c("parent_index" = "parent_index"))
@@ -1408,17 +1378,10 @@ df_hh_full <- left_join(df_hh_full, pivot_table_summary,
 df_hh_full <- left_join(df_hh_full, pivot_table_summary_child,
                         by = c("_index" = "_index"))
 
-view(df_hh_full)
-
-
-#write.xlsx(df_hh_full, "Combined/hh_combined_indicators.xlsx", sheetName = "Sheet1", colNames = TRUE, col_labels= TRUE)
-
 
  df_ind_full <- df_ind_full %>%
   rename("_parent_index" = "parent_index")
 
-
-#write.xlsx(df_ind_full, "Combined/ind_combined_indicators.xlsx", sheetName = "Sheet1", colNames = TRUE, col_labels= TRUE)
 
  
 # ------------------------------------------------------------------------------
