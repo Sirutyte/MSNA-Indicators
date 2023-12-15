@@ -1266,8 +1266,13 @@ df_ind$age_cat <- cut(df_ind$DR.11_NUM_AGE,
 
 table(df_ind$age_cat)
 
-round(prop.table(table(df_ind$age_cat)), 2)
+df_ind$
 
+# Population Pyramid
+
+pop_pyramid <- table(df_ind$age_cat, df_ind$female)
+    
+round(prop.table(pop_pyramid,2),2)
 
 # Select all the indicators in one data set:
 # Individual level: 
