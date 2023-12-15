@@ -408,25 +408,40 @@ write_xlsx(df_hh, "RMS/final_household_indicators.xlsx", col_names=TRUE)
 
 df_ind <- df_ind %>%
   mutate(employed = case_when(
-    SE2_SS_WORK	== "yes" & (DR.11_NUM_AGE > 15 & DR.11_NUM_AGE < 65) ~ 1,
+    SE2_SS_WORK == "yes" & (DR.11_NUM_AGE > 15 & DR.11_NUM_AGE < 65) ~ 1,
     SE3_SS_BUSINESS == "yes" & (DR.11_NUM_AGE > 15 & DR.11_NUM_AGE < 65) ~ 1,
     SE4_SS_FAM_BUSINESS == "yes" & (DR.11_NUM_AGE > 15 & DR.11_NUM_AGE < 65) ~ 1,
-    SE5_SS_HELP_FAM_BUSINESS == "yes"& (DR.11_NUM_AGE > 15 & DR.11_NUM_AGE < 65) ~ 1,
-    TRUE ~ 0)
-  ) %>%
+    SE5_SS_HELP_FAM_BUSINESS == "yes" & (DR.11_NUM_AGE > 15 & DR.11_NUM_AGE < 65) ~ 1,
+    SE2_SS_WORK == "no" & (DR.11_NUM_AGE > 15 & DR.11_NUM_AGE < 65) ~ 0,
+    SE3_SS_BUSINESS == "no" & (DR.11_NUM_AGE > 15 & DR.11_NUM_AGE < 65) ~ 0,
+    SE4_SS_FAM_BUSINESS == "no" & (DR.11_NUM_AGE > 15 & DR.11_NUM_AGE < 65) ~ 0,
+    SE5_SS_HELP_FAM_BUSINESS == "no" & (DR.11_NUM_AGE > 15 & DR.11_NUM_AGE < 65) ~ 0,
+    SE2_SS_WORK == "PreferNotAnswer" | SE3_SS_BUSINESS == "PreferNotAnswer" | SE4_SS_FAM_BUSINESS == "PreferNotAnswer" | SE5_SS_HELP_FAM_BUSINESS == "PreferNotAnswer" ~ NA_real_,
+    TRUE ~ NA_real_
+  )) %>%
   mutate(unemployed = case_when(
-    (employed == 0 & SE6_SS_TRY_FIND_JOB == "yes" & SE7_SS_START_WORK_IN_2_WKS == "yes") & (DR.11_NUM_AGE > 15 & DR.11_NUM_AGE < 65) ~ 1,
-    TRUE ~ 0)
-  ) %>%
+    employed == 0 & SE6_SS_TRY_FIND_JOB == "yes" & SE7_SS_START_WORK_IN_2_WKS == "yes" & (DR.11_NUM_AGE > 15 & DR.11_NUM_AGE < 65) ~ 1,
+    employed == 1 & (DR.11_NUM_AGE > 15 & DR.11_NUM_AGE < 65) ~ 0,
+    is.na(employed) | is.na(SE6_SS_TRY_FIND_JOB) | is.na(SE7_SS_START_WORK_IN_2_WKS) ~ NA_real_,
+    TRUE ~ 0
+  )) %>%
   mutate(labour_force = case_when(
-    (employed==1 | unemployed==1) & (DR.11_NUM_AGE > 15 & DR.11_NUM_AGE < 65) ~ 1)
-  ) %>%
-  mutate(outcome13_3_unemployment = unemployed/labour_force)
+    (employed == 1 | unemployed == 1) & (DR.11_NUM_AGE > 15 & DR.11_NUM_AGE < 65) ~ 1,
+    is.na(employed) | is.na(unemployed) ~ NA_real_,
+    TRUE ~ 0
+  ))
 
+unemployed_sum <- sum(df_ind$unemployed, na.rm = TRUE)
+labour_force_total <- sum(df_ind$labour_force, na.rm = TRUE)
 
-table(df_ind$outcome13_3_unemployment)
+df_ind <- df_ind %>%
+  mutate(outcome13_3_unemployment = unemployed_sum / labour_force_total)
+
+mean_outcome13_3_unemployment <- mean(df_ind$outcome13_3_unemployment, na.rm = TRUE)
+print(mean_outcome13_3_unemployment)
 
 write_xlsx(df_ind, "RMS/final_individual_indicators.xlsx", col_names=TRUE)
+
 
 # ------------------------------------------------------------------------------
 # 16.2 Core outcome indicator	
@@ -787,41 +802,3 @@ write.xlsx(df_hh_full, "Combined/household_combined_indicators_slovakia.xlsx", s
 
 write.xlsx(df_ind_full, "Combined/individual_combined_indicators_slovakia.xlsx", sheetName = "Sheet1", colNames = TRUE, col_labels= TRUE)
 
-
-# ------------------------------------------------------------------------------
-# Connect the two datasets / indicators 
-
-
-df_hh_full_table <- df_hh_full %>% 
-  cross_cpct(
-    cell_vars = list(impact3_3_safety_walking, outcome4_1_GBV, outcome13_1_bank_account, outcome13_2_income, outcome16_2_social_protection),
-    col_vars = list(total(), DR7.2_SS_RESP_GEN, resp_age_cat, disability_dummy)
-  ) %>%
-  mutate_if(is.numeric, round, digits = 2)
-
-
-# Individual level: 
-# table(df_ind$impact2_3_health)
-# table(df_ind$impact3_2a)
-# table(df_ind$impact3_2b)
-# table(df_ind$outcome1_2_children_registered)
-# table(df_ind$outcome1_3_legal_documents)
-# table(df_ind$outcome13_3_unemployment)
-
-
-write.xlsx(df_hh_full_table, "Combined/hh_table_slovakia.xlsx", colNames = TRUE, rowNames = TRUE)
-
-
-df_ind_full_table <- df_ind_full %>% 
-  cross_cpct(
-    cell_vars = list(impact2_3_health, impact3_2a_primary_edu_enrol_rate, impact3_2b_secondary_edu_enrol_rate, outcome1_2_children_registered, outcome1_3_legal_documents, outcome13_3_unemployment),
-    col_vars = list(total(), disability, age_cat)
-    ) %>% 
-  mutate_if(is.numeric, round, digits = 2)
-
-
-write.xlsx(df_ind_full_table, "Combined/ind_table_slovakia.xlsx", colNames = TRUE, rowNames =TRUE)
-  
-
-      
-  
