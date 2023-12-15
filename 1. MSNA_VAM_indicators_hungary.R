@@ -1,6 +1,6 @@
 ## Clear environment, if needed
 rm(list = ls())
-setwd("/Users/irmasirutyte/Desktop/MSNA Composite/MSNA_updated_czech")
+setwd("/Users/irmasirutyte/Desktop/MSNA Composite/MSNA_updated_Hungary")
 
 
 ## Libraries
@@ -24,16 +24,30 @@ library(writexl)
 library(expss)
 
 
-sheet_names = excel_sheets("Data/2023_Czech_Republic_Multi-Sector_Needs_Assessment.xlsx") # get sheet names
+
+sheet_names = excel_sheets("Data/unhcr_msna_hh_datafile_fin_HU_01122023.xlsx") # get sheet names
 sheet_names # print sheet names
 
-# Read Sheet 1
-df_hh <- read_excel("Data/2023_Czech_Republic_Multi-Sector_Needs_Assessment.xlsx", sheet = "2023 Czech Republic Multi-Se...")
-View(df_hh)
+df_hh <- read_excel("Data/unhcr_msna_hh_datafile_fin_HU_01122023.xlsx")
+
+df_hh <-df_hh %>% 
+  rename_all(~stringr::str_replace(.,"^@",""))
+
+view(df_hh)
 
 # Read Sheet 2
-df_ind <- read_excel("Data/2023_Czech_Republic_Multi-Sector_Needs_Assessment.xlsx", sheet = "Info")
+df_ind <- read_excel("Data/unhcr_msna_ind_datafile_fin_HU_01122023.xlsx")
 
+
+
+df_ind <-df_ind %>% 
+  rename_all(~stringr::str_replace(.,"index","_index"))
+
+
+df_ind <-df_ind %>% 
+  rename_all(~stringr::str_replace(.,"parent__index","_parent_index"))
+
+view(df_ind)
 
 # ------------------------------------------------------------------------------
 # DISABILITY
@@ -62,8 +76,8 @@ df_ind <-  df_ind %>%
   mutate(
     DISABILITY3 = case_when( # : the level of inclusion is at least one domain/question is coded A LOT OF DIFFICULTY or CANNOT DO AT ALL.
       disSum34 >= 1 ~ 1,
-      disSum34 == 0 & (!(WG.1.1_SS_DIFF_SEE %in% c("refused","DoNotKnow") & WG.1.2_SS_DIFF_HEAR %in% c("refused","DoNotKnow") & WG.1.3_SS_DIFF_WALK %in% c("refused","DoNotKnow") & WG.1.4_SS_DIFF_REM %in% c("refused","DoNotKnow") & WG.1.5_SS_DIFF_DRESS %in% c("refused","DoNotKnow") & WG.1.6_SS_DIFF_COMM %in% c("refused","DoNotKnow"))) ~ 0,
-      WG.1.1_SS_DIFF_SEE %in% c("refused","DoNotKnow") & WG.1.2_SS_DIFF_HEAR %in% c("refused","DoNotKnow") & WG.1.3_SS_DIFF_WALK %in% c("refused","DoNotKnow") & WG.1.4_SS_DIFF_REM %in% c("refused","DoNotKnow") & WG.1.5_SS_DIFF_DRESS %in% c("refused","DoNotKnow") & WG.1.6_SS_DIFF_COMM %in% c("refused","DoNotKnow") ~ 98
+      disSum34 == 0 & (!(WG.1.1_SS_DIFF_SEE %in% c("refused","DoNotKnow","Prefer not to answer") & WG.1.2_SS_DIFF_HEAR %in% c("refused","DoNotKnow","Prefer not to answer") & WG.1.3_SS_DIFF_WALK %in% c("refused","DoNotKnow","Prefer not to answer") & WG.1.4_SS_DIFF_REM %in% c("refused","DoNotKnow","Prefer not to answer") & WG.1.5_SS_DIFF_DRESS %in% c("refused","DoNotKnow","Prefer not to answer") & WG.1.6_SS_DIFF_COMM %in% c("refused","DoNotKnow","Prefer not to answer"))) ~ 0,
+      WG.1.1_SS_DIFF_SEE %in% c("refused","DoNotKnow","Prefer not to answer") & WG.1.2_SS_DIFF_HEAR %in% c("refused","DoNotKnow","Prefer not to answer") & WG.1.3_SS_DIFF_WALK %in% c("refused","DoNotKnow","Prefer not to answer") & WG.1.4_SS_DIFF_REM %in% c("refused","DoNotKnow","Prefer not to answer") & WG.1.5_SS_DIFF_DRESS %in% c("refused","DoNotKnow","Prefer not to answer") & WG.1.6_SS_DIFF_COMM %in% c("refused","DoNotKnow","Prefer not to answer") ~ 98
     )
   ) %>%
   mutate(
@@ -87,8 +101,6 @@ df_ind <- df_ind %>%
                             "With disability" = 1)
   ))
 table(df_ind$disability)
-
-round(prop.table(table(df_ind$disability)), 2)
 
 
 # -----------------------------------------------------------------------------
@@ -149,8 +161,6 @@ val_lab(df_hh$FCSCat28) = num_lab("
              3 Acceptable
 ")
 var_label(df_hh$FCSCat28) <- "FCS Categories"
-
-round(prop.table(table(df_hh$FCSCat28)), 2)
 
 
 # -----------------------------------------------------------------------------
@@ -243,7 +253,6 @@ val_lab(df_hh$Max_coping_behaviourEN) = num_lab("
              4 Emergencies coping strategies
 ")
 
-round(prop.table(table(df_hh$Max_coping_behaviourEN)), 2)
 
 # -----------------------------------------------------------------------------
 # REDUCED COPING STRATEGIES INDEX
@@ -280,12 +289,10 @@ df_hh <- df_hh %>% mutate(rCSI = FS.3.1_NUM_COPE + (2 * FS.3.2_NUM_BURROW) + FS.
 var_label(df_hh$rCSI) <- "Reduced coping strategies index (rCSI)"
 
 
-# Unweighted - rCSI score
+# Unweighted
 rCSI_table_mean <- df_hh %>% 
   drop_na(rCSI) %>% 
   summarise(meanrCSI = mean(rCSI))
-
-print(rCSI_table_mean)
 
 
 # ------------------------------------------------------------------------------
@@ -376,12 +383,12 @@ df_hh$share_other_expenditure <- round(df_hh$SE.2.7_NUM_OTH / df_hh$total_expend
 df_hh_export <- df_hh %>%
   select("_index", "FCS","FCSCat21", "stress_coping_EN", "emergency_coping_EN", "crisis_coping_EN", "Max_coping_behaviourEN", "rCSI", "total_expenditure", "share_food_expenditure","share_accomm_expenditure", "share_health_expenditure","share_hygiene_expenditure","share_communication_expenditure","share_hh_bills_expenditure","share_education_expenditure","share_debt_expenditure","share_other_expenditure" ) 
 
-write.xlsx(df_hh_export, "VAM/hh_indicators_czech.xlsx")
+write.xlsx(df_hh_export, "VAM/hh_indicators_hungary.xlsx")
 
 
 df_ind_export <- df_ind %>%
   select("_index","_parent_index","disability") 
 
-write.xlsx(df_ind_export, "VAM/ind_indicators_czech.xlsx")
+write.xlsx(df_ind_export, "VAM/ind_indicators_hungary.xlsx")
 
 
