@@ -104,6 +104,8 @@ df_ind <- df_ind %>% ## Add up who needed services ( both who accessed and did n
 
 table(df_ind$impact2_3_health)
 
+round(prop.table(table(df_ind$disability)), 2)
+
 write_xlsx(df_ind, "RMS/final_individual_indicators.xlsx", col_names=TRUE)
 
 
@@ -215,6 +217,7 @@ df_hh <- df_hh %>%
 
 table(df_hh$impact3_3_safety_walking)
 
+round(prop.table(table(df_hh$impact3_3_safety_walking)), 2)
 
 write_xlsx(df_hh, "RMS/final_household_indicators.xlsx", col_names=TRUE)
 
@@ -276,6 +279,8 @@ df_ind <- df_ind %>%
 
 table(df_ind$outcome1_2_children_registered)
 
+round(prop.table(table(df_ind$outcome1_2_children_registered)), 2)
+
 
 write_xlsx(df_ind, "RMS/final_individual_indicators.xlsx", col_names=TRUE)
 
@@ -302,6 +307,7 @@ df_ind <- df_ind %>%
 
 table(df_ind$outcome1_3_legal_documents)
 
+round(prop.table(table(df_ind$outcome1_3_legal_documents)), 2)
 
 write_xlsx(df_ind, "RMS/final_individual_indicators.xlsx", col_names=TRUE)
 
@@ -336,6 +342,7 @@ df_hh <- df_hh %>%
 
 table(df_hh$outcome4_1_GBV)
 
+round(prop.table(table(df_hh$outcome4_1_GBV)), 2)
 
 write_xlsx(df_hh, "RMS/final_household_indicators.xlsx", col_names=TRUE)
 
@@ -363,6 +370,8 @@ df_hh <- df_hh %>%
 
 table(df_hh$outcome13_1_bank_account)
 
+round(prop.table(table(df_hh$outcome13_1_bank_account)), 2)
+
 write_xlsx(df_hh, "RMS/final_household_indicators.xlsx", col_names=TRUE)
 
 
@@ -389,6 +398,8 @@ df_hh <- df_hh %>%
 
 
 table(df_hh$outcome13_2_income)
+
+round(prop.table(table(df_hh$outcome13_2_income)), 2)
 
 
 write_xlsx(df_hh, "RMS/final_household_indicators.xlsx", col_names=TRUE)
@@ -484,6 +495,7 @@ df_hh <- df_hh %>%
 
 table(df_hh$outcome16_2_social_protection)
 
+round(prop.table(table(df_hh$outcome16_2_social_protection)), 2)
 
 write_xlsx(df_hh, "RMS/final_household_indicators.xlsx", col_names=TRUE)
 
@@ -588,7 +600,7 @@ df_hh <- df_hh %>%
 
 table(df_hh$outcome9_1_housing)
 
-
+round(prop.table(table(df_hh$outcome9_1_housing)), 2)
 
 write_xlsx(df_hh, "RMS/final_household_indicators.xlsx", col_names = TRUE)
 
@@ -627,6 +639,8 @@ df_ind <- df_ind %>%
 
 table(df_ind$outcome10_1_measles)
 
+round(prop.table(table(df_ind$outcome10_1_measles)), 2)
+
 
 ### SAME LOGIC FOR POLIO 
 
@@ -648,7 +662,7 @@ df_ind <- df_ind %>%
 
 table(df_ind$outcome10_1_polio)
 
-
+round(prop.table(table(df_ind$outcome10_1_polio)), 2)
 
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
@@ -790,7 +804,7 @@ df_ind <- df_ind %>%
                                              label = "Accessing Ukrainian distant learning"))
 
 
-
+round(prop.table(table(df_ind$distant_learning_grouped)), 2)
 
 # attending both distant learning and school in host country
 
@@ -802,6 +816,8 @@ df_ind <- df_ind %>%
   ))
 
 table(df_ind$attending_both_education)
+
+round(prop.table(table(df_ind$attending_both_education)), 2)
 
 
 #write_xlsx(df_ind, "check_education.xlsx", col_names = TRUE)
@@ -862,7 +878,7 @@ df_hh_filtered_needs %>%
 
 
 # ------------------------------------------------------------------------------
-# Top three most commonly reported priority needs, by % of HHs per type of priority need reported
+# % of respondents reporting awareness of protection services in the area they are residing
 # ------------------------------------------------------------------------------
 
 
@@ -874,6 +890,8 @@ df_hh <- df_hh %>%
   ))
 
 table(df_hh$protection_services_awareness)
+
+round(prop.table(table(df_hh$protection_services_awareness)), 2)
 
 
 #write_xlsx(df_hh, "check_awareness.xlsx", col_names = TRUE)
@@ -1158,11 +1176,11 @@ df_ind <- df_ind %>%
     TRUE ~ NA_real_   ))
 
 df_selected <- df_ind %>%
-  
   select(DR.11_NUM_AGE, employed,E1_SS_ATT_EDU, SE8_SS_ACTIVITY,inactive_youth)
 
 view(df_selected)
 
+round(prop.table(table(df_ind$inactive_youth)), 2)
 
 write_xlsx(df_ind, "check_inactive_youth.xlsx", col_names = TRUE)
 
@@ -1262,6 +1280,8 @@ df_ind$age_cat <- cut(df_ind$DR.11_NUM_AGE,
 
 
 table(df_ind$age_cat)
+
+round(prop.table(table(df_ind$age_cat)), 2)
 
 
 # Select all the indicators in one data set:
