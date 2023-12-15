@@ -1,7 +1,6 @@
-
 ## Clear environment, if needed
 rm(list = ls())
-setwd("/Users/irmasirutyte/Desktop/MSNA Composite/MSNA_updated_czech")
+setwd("/Users/irmasirutyte/Desktop/MSNA Composite/MSNA_updated_Hungary")
 
 
 ## Libraries
@@ -23,20 +22,27 @@ library(Hmisc)
 library(xlsx)
 library(writexl)
 library(expss)
-# Load the required packages
 
 
 
-
-sheet_names = excel_sheets("Data/2023_Czech_Republic_Multi-Sector_Needs_Assessment.xlsx") # get sheet names
+sheet_names = excel_sheets("Data/unhcr_msna_hh_datafile_fin_HU_01122023.xlsx") # get sheet names
 sheet_names # print sheet names
 
-# Read Sheet 1
-df_hh <- read_excel("Data/2023_Czech_Republic_Multi-Sector_Needs_Assessment.xlsx", sheet = "2023 Czech Republic Multi-Se...")
-View(df_hh)
+df_hh <- read_excel("Data/unhcr_msna_hh_datafile_fin_HU_01122023.xlsx")
+
+df_hh <-df_hh %>% 
+  rename_all(~stringr::str_replace(.,"^@",""))
 
 # Read Sheet 2
-df_ind <- read_excel("Data/2023_Czech_Republic_Multi-Sector_Needs_Assessment.xlsx", sheet = "Info")
+df_ind <- read_excel("Data/unhcr_msna_ind_datafile_fin_HU_01122023.xlsx")
+
+
+df_ind <-df_ind %>% 
+  rename_all(~stringr::str_replace(.,"index","_index"))
+
+
+df_ind <-df_ind %>% 
+  rename_all(~stringr::str_replace(.,"parent__index","_parent_index"))
 
 
 # ------------------------------------------------------------------------------
@@ -104,8 +110,6 @@ df_ind <- df_ind %>% ## Add up who needed services ( both who accessed and did n
 
 
 table(df_ind$impact2_3_health)
-
-round(prop.table(table(df_ind$disability)), 2)
 
 write_xlsx(df_ind, "RMS/final_individual_indicators.xlsx", col_names=TRUE)
 
@@ -198,10 +202,10 @@ write_xlsx(df_ind, "RMS/final_individual_indicators.xlsx", col_names=TRUE)
 
 # ------------------------------------------------------------------------------
 # 3.3 Core impact indicator
-# Proportion of population that feel safe walking alone in their neighborhood
+# Proportion of population that feel safe walking alone in their neighbourhood
 # ------------------------------------------------------------------------------
 
-# PRT06_SS_SAFETY_LVL	- How safe do you feel walking alone in your area/neighborhood after dark?
+# PRT06_SS_SAFETY_LVL	- How safe do you feel walking alone in your area/neighbourhood after dark?
 
 df_hh <- df_hh %>%
   mutate(impact3_3_safety_walking = case_when(
@@ -218,7 +222,6 @@ df_hh <- df_hh %>%
 
 table(df_hh$impact3_3_safety_walking)
 
-round(prop.table(table(df_hh$impact3_3_safety_walking)), 2)
 
 write_xlsx(df_hh, "RMS/final_household_indicators.xlsx", col_names=TRUE)
 
@@ -280,8 +283,6 @@ df_ind <- df_ind %>%
 
 table(df_ind$outcome1_2_children_registered)
 
-round(prop.table(table(df_ind$outcome1_2_children_registered)), 2)
-
 
 write_xlsx(df_ind, "RMS/final_individual_indicators.xlsx", col_names=TRUE)
 
@@ -308,7 +309,6 @@ df_ind <- df_ind %>%
 
 table(df_ind$outcome1_3_legal_documents)
 
-round(prop.table(table(df_ind$outcome1_3_legal_documents)), 2)
 
 write_xlsx(df_ind, "RMS/final_individual_indicators.xlsx", col_names=TRUE)
 
@@ -330,7 +330,8 @@ write_xlsx(df_ind, "RMS/final_individual_indicators.xlsx", col_names=TRUE)
 df_hh <- df_hh %>%
   mutate(outcome4_1_GBV = case_when(
     GBV01a_SS_HLTH == "yes" |  GBV01b_SS_PSY == "yes" |  GBV01c_SS_SAFE == "yes" |  GBV01e_SS_LEGAL == "yes" ~ 1,
-    GBV01a_SS_HLTH == "PreferNotAnswer" & GBV01b_SS_PSY == "PreferNotAnswer" &  GBV01c_SS_SAFE == "PreferNotAnswer" &  GBV01e_SS_LEGAL == "PreferNotAnswer" ~ NA_real_,    
+    GBV01a_SS_HLTH == "PreferNotAnswer" & GBV01b_SS_PSY == "PreferNotAnswer" &  GBV01c_SS_SAFE == "PreferNotAnswer" &  GBV01e_SS_LEGAL == "PreferNotAnswer" ~ NA_real_,   
+    
     TRUE ~ 0)
   ) %>%
   mutate(outcome4_1_GBV = labelled(outcome4_1_GBV,
@@ -343,7 +344,6 @@ df_hh <- df_hh %>%
 
 table(df_hh$outcome4_1_GBV)
 
-round(prop.table(table(df_hh$outcome4_1_GBV)), 2)
 
 write_xlsx(df_hh, "RMS/final_household_indicators.xlsx", col_names=TRUE)
 
@@ -356,7 +356,7 @@ write_xlsx(df_hh, "RMS/final_household_indicators.xlsx", col_names=TRUE)
 ## L12_SS_HV_BNK_ACC	- Do you currently have a bank account or account at a formal financial institution in the Czech Republic, either by yourself or with someone else?
 
 df_hh <- df_hh %>%
-  mutate(
+  mutate( 
     outcome13_1_bank_account = case_when(
       L12_SS_HV_BNK_ACC == "yes" ~ 1,
       L12_SS_HV_BNK_ACC == "no" ~ 0,
@@ -370,8 +370,6 @@ df_hh <- df_hh %>%
                                 label = "PoC with an account at a bank or other financial institution or with a mobile-money service provider"))
 
 table(df_hh$outcome13_1_bank_account)
-
-round(prop.table(table(df_hh$outcome13_1_bank_account)), 2)
 
 write_xlsx(df_hh, "RMS/final_household_indicators.xlsx", col_names=TRUE)
 
@@ -400,8 +398,6 @@ df_hh <- df_hh %>%
 
 table(df_hh$outcome13_2_income)
 
-round(prop.table(table(df_hh$outcome13_2_income)), 2)
-
 
 write_xlsx(df_hh, "RMS/final_household_indicators.xlsx", col_names=TRUE)
 
@@ -410,10 +406,8 @@ write_xlsx(df_hh, "RMS/final_household_indicators.xlsx", col_names=TRUE)
 # Proportion of Persons of Concern (working age) who are unemployed
 # ------------------------------------------------------------------------------
 
-# Working age is 
-
 ## Numerator: Those of working age who were not in employment, looked for employment in the past 30 days and were available to take up employment
-## Denominator: Those of working age in labor force
+## Denominator: Those of working age in labour force
 
 # SE2_SS_WORK	 - During the past 7 days, did this person work for someone else for pay, for one or more hours?
 # SE3_SS_BUSINESS	 - During the past 7 days, did this person run or do any kind of business, farming, or other activity to generate income?
@@ -422,44 +416,31 @@ write_xlsx(df_hh, "RMS/final_household_indicators.xlsx", col_names=TRUE)
 # SE6_SS_TRY_FIND_JOB	- During the last 30 days, did this person do anything to find a paid job or try to start a business?
 # SE7_SS_START_WORK_IN_2_WKS- Could this person start working within the next two weeks if he/she was offered a job??
 
-# Unemployed persons are defined as all those of working age (i.e., in the workforce - to be defined by each country context in line with legal definition) who were not in employment, carried out activities to seek employment during the past 7 days and were currently available to take up employment (SDG Indicator 8.5.2).
-
 df_ind <- df_ind %>%
   mutate(employed = case_when(
-    SE2_SS_WORK == "yes" & (DR.11_NUM_AGE > 15 & DR.11_NUM_AGE < 65) ~ 1,
+    SE2_SS_WORK	== "yes" & (DR.11_NUM_AGE > 15 & DR.11_NUM_AGE < 65) ~ 1,
     SE3_SS_BUSINESS == "yes" & (DR.11_NUM_AGE > 15 & DR.11_NUM_AGE < 65) ~ 1,
     SE4_SS_FAM_BUSINESS == "yes" & (DR.11_NUM_AGE > 15 & DR.11_NUM_AGE < 65) ~ 1,
-    SE5_SS_HELP_FAM_BUSINESS == "yes" & (DR.11_NUM_AGE > 15 & DR.11_NUM_AGE < 65) ~ 1,
-    SE2_SS_WORK == "no" & (DR.11_NUM_AGE > 15 & DR.11_NUM_AGE < 65) ~ 0,
+    SE5_SS_HELP_FAM_BUSINESS == "yes"& (DR.11_NUM_AGE > 15 & DR.11_NUM_AGE < 65) ~ 1,
+    SE2_SS_WORK	== "no" & (DR.11_NUM_AGE > 15 & DR.11_NUM_AGE < 65) ~ 0,
     SE3_SS_BUSINESS == "no" & (DR.11_NUM_AGE > 15 & DR.11_NUM_AGE < 65) ~ 0,
     SE4_SS_FAM_BUSINESS == "no" & (DR.11_NUM_AGE > 15 & DR.11_NUM_AGE < 65) ~ 0,
-    SE5_SS_HELP_FAM_BUSINESS == "no" & (DR.11_NUM_AGE > 15 & DR.11_NUM_AGE < 65) ~ 0,
-    SE2_SS_WORK == "PreferNotAnswer" | SE3_SS_BUSINESS == "PreferNotAnswer" | SE4_SS_FAM_BUSINESS == "PreferNotAnswer" | SE5_SS_HELP_FAM_BUSINESS == "PreferNotAnswer" ~ NA_real_,
-    TRUE ~ NA_real_
-  )) %>%
+    SE5_SS_HELP_FAM_BUSINESS == "no"& (DR.11_NUM_AGE > 15 & DR.11_NUM_AGE < 65) ~ 0,
+    TRUE ~ NA_real_)
+  ) %>%
   mutate(unemployed = case_when(
-    employed == 0 & SE6_SS_TRY_FIND_JOB == "yes" & SE7_SS_START_WORK_IN_2_WKS == "yes" & (DR.11_NUM_AGE > 15 & DR.11_NUM_AGE < 65) ~ 1,
-    employed == 1 & (DR.11_NUM_AGE > 15 & DR.11_NUM_AGE < 65) ~ 0,
-    is.na(employed) | is.na(SE6_SS_TRY_FIND_JOB) | is.na(SE7_SS_START_WORK_IN_2_WKS) ~ NA_real_,
-    TRUE ~ 0
-  )) %>%
+    (employed == 0 & SE6_SS_TRY_FIND_JOB == "yes" & SE7_SS_START_WORK_IN_2_WKS == "yes") & (DR.11_NUM_AGE > 15 & DR.11_NUM_AGE < 65) ~ 1,
+    TRUE ~ 0)
+  ) %>%
   mutate(labour_force = case_when(
-    (employed == 1 | unemployed == 1) & (DR.11_NUM_AGE > 15 & DR.11_NUM_AGE < 65) ~ 1,
-    is.na(employed) | is.na(unemployed) ~ NA_real_,
-    TRUE ~ 0
-  ))
+    (employed==1 | unemployed==1) & (DR.11_NUM_AGE > 15 & DR.11_NUM_AGE < 65) ~ 1)
+  ) %>%
+  mutate(outcome13_3_unemployment = unemployed/labour_force)
 
-unemployed_sum <- sum(df_ind$unemployed, na.rm = TRUE)
-labour_force_total <- sum(df_ind$labour_force, na.rm = TRUE)
 
-df_ind <- df_ind %>%
-  mutate(outcome13_3_unemployment = unemployed_sum / labour_force_total)
-
-mean_outcome13_3_unemployment <- mean(df_ind$outcome13_3_unemployment, na.rm = TRUE)
-print(mean_outcome13_3_unemployment)
+table(df_ind$outcome13_3_unemployment)
 
 write_xlsx(df_ind, "RMS/final_individual_indicators.xlsx", col_names=TRUE)
-
 
 # ------------------------------------------------------------------------------
 # 16.2 Core outcome indicator	
@@ -493,7 +474,6 @@ df_hh <- df_hh %>%
 
 table(df_hh$outcome16_2_social_protection)
 
-round(prop.table(table(df_hh$outcome16_2_social_protection)), 2)
 
 write_xlsx(df_hh, "RMS/final_household_indicators.xlsx", col_names=TRUE)
 
@@ -598,9 +578,10 @@ df_hh <- df_hh %>%
 
 table(df_hh$outcome9_1_housing)
 
-round(prop.table(table(df_hh$outcome9_1_housing)), 2)
+
 
 write_xlsx(df_hh, "RMS/final_household_indicators.xlsx", col_names = TRUE)
+
 
 
 # ------------------------------------------------------------------------------
@@ -637,8 +618,6 @@ df_ind <- df_ind %>%
 
 table(df_ind$outcome10_1_measles)
 
-round(prop.table(table(df_ind$outcome10_1_measles)), 2)
-
 
 ### SAME LOGIC FOR POLIO 
 
@@ -660,591 +639,9 @@ df_ind <- df_ind %>%
 
 table(df_ind$outcome10_1_polio)
 
-round(prop.table(table(df_ind$outcome10_1_polio)), 2)
 
-# ------------------------------------------------------------------------------
-# ------------------------------------------------------------------------------
-# OTHER INDICATORS FOR FACTBOOK !!!
-# ------------------------------------------------------------------------------
-# ------------------------------------------------------------------------------
-
-# not all these nationalities included in Czech but they will be useful when copy-pasting for other countries
-
-df_hh <- df_hh %>% 
-  mutate(nationality = case_when(
-    DR1_SM_NAT %in% c("bulgarian", "moldovan", "romanian", "russian") ~ "other",
-    DR1_SM_NAT %in% c("moldovan ukrainian", "polish ukrainian", "russian ukrainian", "ukrainian bulgarian",
-                      "ukrainian hungarian", "ukrainian moldovan", "ukrainian other", "ukrainian polish",
-                      "ukrainian romanian", "ukrainian russian", "ukrainian russian polish", "ukrainian slovakian") ~ "ukrainian + other",
-    DR1_SM_NAT == "ukrainian" ~ "ukrainian",
-    TRUE ~ NA_character_
-  ))
-
-
-result_nationality <- df_hh %>%
-  group_by(nationality) %>%
-  summarise(Count = n()) %>%
-  mutate(Percentage = prop.table(Count) * 100)
-
-print(result_nationality)
-
-
-# ------------------------------------------------------------------------------
-#  RURAL vs URBAN
-# ------------------------------------------------------------------------------
-# Percentage of households living in rural areas vs urban areas
-column_name <- 'SHL01.2_SS_URB_RURAL'
-
-# Exclude non-response and create a new dataset
-df_hh_rural <- df_hh[df_hh[[column_name]] != "do_not_know", ]
-
-# Use table() to tabulate response options
-tabulated_data <- table(df_hh_rural[[column_name]])
-
-# Calculate the percentage of total for each category
-percentage_data <- prop.table(tabulated_data) * 100
-
-# Combine the tabulated data and percentage data into a data frame
-result_rural_urban <- data.frame(
-  ResponseCategory = names(tabulated_data),
-  Count = as.numeric(tabulated_data),
-  Percentage = as.numeric(percentage_data)
-)
-
-# Print or display the result
-print(result_rural_urban)
-
-
-# ------------------------------------------------------------------------------
-#-- Average Household Size (DR8_NUM_HH_SIZE) ----
-# ------------------------------------------------------------------------------
-
-df_hh %>% filter(!is.na(DR8_NUM_HH_SIZE)) %>% summarise(mean = mean(DR8_NUM_HH_SIZE))
-
-# ------------------------------------------------------------------------------
-# % of school-aged children reported attending 2022/2023 school year in host country
-# ------------------------------------------------------------------------------
-# E1_SS_ATT_EDU - Is/was your child enrolled and attending formal education (school/kindergarten/nursery) in [host country] in 2022/2023?
-
-column_name <- 'E1_SS_ATT_EDU'
-
-# Exclude "PreferNotAnswer" response
-df_ind_education <- df_ind[df_ind[[column_name]] != "PreferNotAnswer", ]
-
-
-# Use table() to tabulate response options
-tabulated_data <- table(df_ind_education[[column_name]])
-
-# Calculate the percentage of total for each category
-percentage_data <- prop.table(tabulated_data) * 100
-
-# Combine the tabulated data and percentage data into a data frame
-attending_school_host_country <- data.frame(ResponseCategory = names(tabulated_data),
-                        Count = as.numeric(tabulated_data),
-                        Percentage = as.numeric(percentage_data))
-
-# Print or display the result
-print(attending_school_host_country)
-
-view(df_ind)
-
-
-# ------------------------------------------------------------------------------
-# % of children reported to attend early childhood education and care services in host country 
-# ------------------------------------------------------------------------------
-# 2 to 5 years old 
-
-# Column name for education attendance
-column_name <- 'E5_SS_EARLY_EDU'
-
-# Exclude "PreferNotAnswer" response and create a new dataset
-df_ind_early <- df_ind[!(df_ind[[column_name]] %in% c("prefer_not_to_answer", "dont_know","PreferNotAnswer","not_sure","DoNotKnow")), ]
-
-# Use table() to tabulate response options
-tabulated_data <- table(df_ind_early[[column_name]])
-
-# Calculate the percentage of total for each category
-percentage_data <- prop.table(tabulated_data) * 100
-
-# Combine the tabulated data and percentage data into a data frame
-attending_early_education <- data.frame(
-  ResponseCategory = names(tabulated_data),
-  Count = as.numeric(tabulated_data),
-  Percentage = as.numeric(percentage_data)
-)
-
-# Print or display the result
-print(attending_early_education)
-
-# View the original df_ind dataset
-view(df_ind)
-
-
-# ------------------------------------------------------------------------------
-# % of school-aged children accessing Ukrainian distance learning
-# ------------------------------------------------------------------------------
-
-unique_responses <- unique(df_ind$E6_SS_DIST_LER)
-print(unique_responses)
-
-df_ind <- df_ind %>%
-  mutate(distant_learning_grouped = case_when(
-    E6_SS_DIST_LER == "no"  ~ 0, 
-    E6_SS_DIST_LER %in% paste0("grade_", 1:12) & (DR.11_NUM_AGE > 5 & DR.11_NUM_AGE < 16) ~ 1, 
-    E6_SS_DIST_LER == "PreferNotAnswer"  ~ NA_real_ , 
-    TRUE ~ NA_real_
-  )) %>%
-  mutate(distant_learning_grouped = labelled(distant_learning_grouped,
-                                             labels = c(
-                                               "Yes" = 1,
-                                               "No" = 0
-                                             ),
-                                             label = "Accessing Ukrainian distant learning"))
-
-
-round(prop.table(table(df_ind$distant_learning_grouped)), 2)
-
-# attending both distant learning and school in host country
-
-df_ind <- df_ind %>%
-    mutate(attending_both_education = case_when(
-    (distant_learning_grouped == 1 & E1_SS_ATT_EDU == "yes") & (DR.11_NUM_AGE > 5 & DR.11_NUM_AGE < 16) ~ 1,
-    (DR.11_NUM_AGE > 5 & DR.11_NUM_AGE < 16) ~ 0,
-    TRUE ~ NA_real_
-  ))
-
-table(df_ind$attending_both_education)
-
-round(prop.table(table(df_ind$attending_both_education)), 2)
-
-
-#write_xlsx(df_ind, "check_education.xlsx", col_names = TRUE)
-
-
-
-# ------------------------------------------------------------------------------
-# PREFERRED INFORMATION CHANNELS TOP 3
-# ------------------------------------------------------------------------------
-
-
-df_hh %>%
-  select(AAP.3_SM_PRF_INFO_CHNL_phone_call_helpline, AAP.3_SM_PRF_INFO_CHNL_sms, AAP.3_SM_PRF_INFO_CHNL_messenger,
-         AAP.3_SM_PRF_INFO_CHNL_viber, AAP.3_SM_PRF_INFO_CHNL_facebook, AAP.3_SM_PRF_INFO_CHNL_telegram,
-         AAP.3_SM_PRF_INFO_CHNL_whatsapp, AAP.3_SM_PRF_INFO_CHNL_signal, AAP.3_SM_PRF_INFO_CHNL_tv,
-         AAP.3_SM_PRF_INFO_CHNL_newspapers_magazines, AAP.3_SM_PRF_INFO_CHNL_billboards_posters,
-         AAP.3_SM_PRF_INFO_CHNL_leaflets, AAP.3_SM_PRF_INFO_CHNL_face_to_face, AAP.3_SM_PRF_INFO_CHNL_email, 
-         AAP.3_SM_PRF_INFO_CHNL_official_websites) %>%
-  pivot_longer(cols = everything(),
-               names_to = "variable",
-               values_to = "answer") %>%
-  group_by(variable) %>%
-  summarise(per = round(sum(answer == 1, na.rm = TRUE) / sum(!is.na(answer)), 3)) %>%
-  arrange(desc(per))
-
-
-# ------------------------------------------------------------------------------
-# Preferred means of providing feedback to aid providers about the quality, quantity and approriateness of aid
-# ------------------------------------------------------------------------------
-
-df_hh %>%
-  select(starts_with("AAP.4_SM_PRF_FEEDBACK")) %>%
-  mutate(across(everything(), as.character)) %>%
-  pivot_longer(cols = everything(),
-               names_to = "variable",
-               values_to = "answer") %>%
-  group_by(variable) %>%
-  summarise(per = round(sum(answer == "1", na.rm = TRUE) / sum(!is.na(answer)), 3)) %>%
-  arrange(desc(per))
-
-
-# ------------------------------------------------------------------------------
-# Top three most commonly reported priority needs, by % of HHs per type of priority need reported
-# ------------------------------------------------------------------------------
-
-df_hh_filtered_needs <- filter(df_hh, AAP.5_SM_TOP_NEEDS_no_needs  != 1)
-
-df_hh_filtered_needs %>%
-  select(starts_with("AAP.5_SM_TOP_NEEDS")) %>%
-  mutate(across(everything(), as.character)) %>%
-  pivot_longer(cols = everything(),
-               names_to = "variable",
-               values_to = "answer") %>%
-  group_by(variable) %>%
-  summarise(per = round(sum(answer == "1", na.rm = TRUE) / sum(!is.na(answer)), 3)) %>%
-  arrange(desc(per))
-
-
-
-# ------------------------------------------------------------------------------
-# % of respondents reporting awareness of protection services in the area they are residing
-# ------------------------------------------------------------------------------
-
-
-df_hh <- df_hh %>%
-  mutate(protection_services_awareness = case_when(
-    PRT03_SM_AVL_SRV == "none_of_the_above" | PRT03_SM_AVL_SRV == "dont_know" ~ 0,
-    PRT03_SM_AVL_SRV != "none_of_the_above" & PRT03_SM_AVL_SRV != "dont_know" ~ 1,
-    TRUE ~ NA_real_
-  ))
-
-table(df_hh$protection_services_awareness)
-
-round(prop.table(table(df_hh$protection_services_awareness)), 2)
-
-
-#write_xlsx(df_hh, "check_awareness.xlsx", col_names = TRUE)
-
-
-# ------------------------------------------------------------------------------
-# Major barriers for accessing services on GBV
-# ------------------------------------------------------------------------------
-
-# GBV02_SM_GBV_BARR - multi-response question
-# remove GBV02_SM_GBV_BARR_no_need_to_check
-
-df_hh_filtered_gbv <- filter(df_hh, GBV02_SM_GBV_BARR_no_need_to_check != 1)
-
-df_hh_filtered_gbv %>%
-  select(starts_with("GBV02_SM_GBV_BARR")) %>%
-  mutate(across(everything(), as.character)) %>%
-  pivot_longer(cols = everything(),
-               names_to = "variable",
-               values_to = "answer") %>%
-  group_by(variable) %>%
-  summarise(per = round(sum(answer == "1", na.rm = TRUE) / sum(!is.na(answer)), 3)) %>%
-  arrange(desc(per))
-
-
-# ------------------------------------------------------------------------------
-# Top 3 - % of HH members by main difficulty finding work in host country
-# ------------------------------------------------------------------------------
-
-# SE12_SM_EMP_BARR
-
-df_hh_filtered_difficulty_work <- filter(df_ind, SE12_SM_EMP_BARR_none  != 1)
-
-
-df_hh_filtered_difficulty_work %>%
-  select(starts_with("SE12_SM_EMP_BARR")) %>%
-  mutate(across(everything(), as.character)) %>%
-  pivot_longer(cols = everything(),
-               names_to = "variable",
-               values_to = "answer") %>%
-  group_by(variable) %>%
-  summarise(per = round(sum(answer == "1", na.rm = TRUE) / sum(!is.na(answer)), 3)) %>%
-  arrange(desc(per))
-
-
-# ------------------------------------------------------------------------------
-# % of HH members employed formally (with contract) 
-# ------------------------------------------------------------------------------
-
-# !!!!!!! CHECK IF OUT OF TOTAL HOUSEHOLDS OR THOSE EMPLOYED ??? 
-
-
-column_name <- 'SE11_SS_CONTRACT'
-
-# Exclude "PreferNotAnswer" or "dont_know" responses
-df_ind_contract <- df_ind[!(df_ind[[column_name]] %in% c("prefer_not_to_answer", "dont_know")), ]
-
-
-# Use table() to tabulate response options
-tabulated_data <- table(df_ind_contract[[column_name]])
-
-# Calculate the percentage of total for each category
-percentage_data <- prop.table(tabulated_data) * 100
-
-# Combine the tabulated data and percentage data into a data frame
-work_contract <- data.frame(ResponseCategory = names(tabulated_data),
-                                            Count = as.numeric(tabulated_data),
-                                            Percentage = as.numeric(percentage_data))
-
-# Print or display the result
-print(work_contract)
-
-
-
-# ------------------------------------------------------------------------------
-# Top 3 - Main areas of support required for socio-economic inclusion
-# ------------------------------------------------------------------------------
-
-
-### CZECH DOES NOT HAVE THIS QUESTION !!!!!
-
-# SE1_SM_SUP_SRV - multi-response
-# 
-# df_hh %>%
-#   select(starts_with("SE1_SM_SUP_SRV")) %>%
-#   mutate(across(everything(), as.character)) %>%
-#   pivot_longer(cols = everything(),
-#                names_to = "variable",
-#                values_to = "answer") %>%
-#   group_by(variable) %>%
-#   summarise(per = round(sum(answer == "1", na.rm = TRUE) / sum(!is.na(answer)), 3)) %>%
-#   arrange(desc(per))
-
-# ------------------------------------------------------------------------------
-# Top 3 - % of HHs household members by self-reported barriers to accessing health care in the last 30 days
-# ------------------------------------------------------------------------------
-
-# H4_SM_HLTH_ACC_BARRIER
-
-df_ind %>%
-  select(starts_with("H4_SM_HLTH_ACC_BARRIER")) %>%
-  mutate(across(everything(), as.character)) %>%
-  pivot_longer(cols = everything(),
-               names_to = "variable",
-               values_to = "answer") %>%
-  group_by(variable) %>%
-  summarise(per = round(sum(answer == "1", na.rm = TRUE) / sum(!is.na(answer)), 3)) %>%
-  arrange(desc(per))
-
-
-
-# ------------------------------------------------------------------------------
-# % of HH members by highest education level achieved
-# ------------------------------------------------------------------------------
-# SE1_SS_EDU_LVL
-
-# group master + phd + grand_phd
-
-df_ind <- df_ind %>%
-  mutate(education_level = case_when(
-    SE1_SS_EDU_LVL %in% c("master", "phd", "grand_phd") ~ "Master and above",
-    SE1_SS_EDU_LVL %in% c("no_edu", "pri_edu", "sec_edu") ~ "Lower education",
-    TRUE ~ as.character(SE1_SS_EDU_LVL)
-  ))
-
-# Assuming your column name is "SE1_SS_EDU_LVL"
-column_name <- "education_level"
-
-# Exclude "PreferNotAnswer" responses
-df_education <- df_ind[df_ind[[column_name]] != "PreferNotAnswer", ]
-
-# Use table() to tabulate response options
-tabulated_data <- table(df_education[[column_name]])
-
-# Calculate the percentage of the total for each category
-percentage_data <- prop.table(tabulated_data) * 100
-
-# Combine the tabulated data and percentage data into a data frame
-result_df <- data.frame(ResponseCategory = names(tabulated_data),
-                        Count = as.numeric(tabulated_data),
-                        Percentage = as.numeric(percentage_data))
-
-# Print or display the result
-print(result_df)
-
-
-# ------------------------------------------------------------------------------
-# % of HHs with children, who do not belong to the nuclear family/families in the HH
-# ------------------------------------------------------------------------------
-
-# Use this CP2_SS_BLG_NF (all minus "yes_nuclear_family" and exclude non-response )
-
-
-# create tag - yes_nuclear_family
-df_ind <- df_ind %>%
-  mutate(children_no_nuclear_family = case_when(
-    CP2_SS_BLG_NF == "yes_nuclear_family" ~ 0, # is part of nuclear family
-    CP2_SS_BLG_NF != "yes_nuclear_family" & !is.na(CP2_SS_BLG_NF) ~ 1,  # do not belong to the nuclear family (and not NA)
-    CP2_SS_BLG_NF == "DoNotKnow" ~ NA_real_,
-    TRUE ~ NA_real_
-  ))
-
-table(df_ind$children_no_nuclear_family)
-
-
-# Exclude "PreferNotAnswer" response
-df_ind_filtered <- df_ind[df_ind$children_no_nuclear_family != "DoNotKnow", ]
-
-# Use table() to tabulate response options
-tabulated_data <- table(df_ind_filtered$children_no_nuclear_family)
-
-# Calculate the percentage of total for each category
-percentage_data <- prop.table(tabulated_data) * 100
-
-# Combine the tabulated data and percentage data into a data frame
-result_children_no_family <- data.frame(
-  ResponseCategory = names(tabulated_data),
-  Count = as.numeric(tabulated_data),
-  Percentage = as.numeric(percentage_data)
-)
-
-# Print or display the result
-print(result_children_no_family)
-
-
-# ------------------------------------------------------------------------------
-# % of HHs who would report inappropriate behaviour from an aid worker
-# ------------------------------------------------------------------------------
-
-# PSEA3_SS_BHV_RPT
-# yes
-# no
-# DoNotKnow
-# PreferNotAnswer
-
-column_name <- "PSEA3_SS_BHV_RPT"
-
-# Exclude "PreferNotAnswer" response
-df_hh_filtered <- df_hh[!(df_hh[[column_name]] %in% c("DoNotKnow", "PreferNotAnswer")), ]
-
-# Use table() to tabulate response options
-tabulated_data <- table(df_hh_filtered[[column_name]])
-
-# Calculate the percentage of total for each category
-percentage_data <- prop.table(tabulated_data) * 100
-
-# Combine the tabulated data and percentage data into a data frame
-result_aid_worker_inappropriate_behavior <- data.frame(
-  ResponseCategory = names(tabulated_data),
-  Count = as.numeric(tabulated_data),
-  Percentage = as.numeric(percentage_data)
-)
-
-# Print or display the result
-print(result_aid_worker_inappropriate_behavior)
-
-
-
-# ------------------------------------------------------------------------------
-# % % of HHs by accommodation arrangement 
-# ------------------------------------------------------------------------------
-
-# Accommodation type: SHL01_SS_ACCOM_TYP
-
-
-# grouped 
-# df_ind <- df_ind %>%
-#   mutate(SHL01_SS_ACCOM_TYP = case_when(
-#     SE1_SS_EDU_LVL %in% c("hotel_hostel", "workers_hostel", "other") ~ "Master and above",
-#     TRUE ~ as.character(SHL01_SS_ACCOM_TYP)
-#   ))
-
-
-column_name <- "SHL01_SS_ACCOM_TYP"
-
-# Exclude "PreferNotAnswer" response
-df_hh_filtered <- df_hh[!(df_hh[[column_name]] %in% c("DoNotKnow", "prefer_not_to_answer")), ]
-
-# Use table() to tabulate response options
-tabulated_data <- table(df_hh_filtered[[column_name]])
-
-# Calculate the percentage of total for each category
-percentage_data <- prop.table(tabulated_data) * 100
-
-# Combine the tabulated data and percentage data into a data frame
-result_accommodation_type <- data.frame(
-  ResponseCategory = names(tabulated_data),
-  Count = as.numeric(tabulated_data),
-  Percentage = as.numeric(percentage_data)
-)
-
-# Print or display the result
-print(result_accommodation_type )
-
-
-# ------------------------------------------------------------------------------
-# % HHs with of youth (age 15-24 years) not in education, employment or training
-# ------------------------------------------------------------------------------
-# 16 to 24 inclusive - that's the data we have for employment
-
-
-# Need to combine indicators on attendance, employment / unemployent and main activity
-
-# SE8_SS_ACTIVITY	Which of the following best describes what (this person) is mainly doing at present?
-# status_unempl	Unemployed/job-seeker
-# studying	Studying
-# professional_training	Professional training
-# engaged_in_HH_resp	Engaged in household or family responsibilities including taking care of children and elderly
-# retired	Retired or Pensioner
-# long_term_ill_injury	With a long-term illness, injury or disability
-# unpaid_volunteering	Doing unpaid volunteering, community or charity work
-
-# Employed: employed != 1
-# Not attending school: E1_SS_ATT_EDU != yes
-# Not attending training: SE8_SS_ACTIVITY !=professional_training | SE8_SS_ACTIVITY !=professional_training = studying
-# Education only in host country?? because now we are removing those who might be attending only online
-
-df_ind <- df_ind %>%  
-  mutate(inactive_youth = case_when(     
-    (employed != 1 & E1_SS_ATT_EDU != "yes" & !(SE8_SS_ACTIVITY %in% c("professional_training", "studying")) & (DR.11_NUM_AGE > 15 & DR.11_NUM_AGE <= 24)) ~ 1,    
-    (employed == 1 | E1_SS_ATT_EDU == "yes" | SE8_SS_ACTIVITY %in% c("professional_training", "studying")) & (DR.11_NUM_AGE > 15 & DR.11_NUM_AGE <= 24) ~ 0,      
-    TRUE ~ NA_real_   ))
-
-df_selected <- df_ind %>%
-  select(DR.11_NUM_AGE, employed,E1_SS_ATT_EDU, SE8_SS_ACTIVITY,inactive_youth)
-
-view(df_selected)
-
-round(prop.table(table(df_ind$inactive_youth)), 2)
-
-# write_xlsx(df_ind, "check_inactive_youth.xlsx", col_names = TRUE)
-
-# ------------------------------------------------------------------------------
-# % of HH paying rent without financial distress
-# ------------------------------------------------------------------------------
-
-# SHL04 - the result of response option paid_on_time
-
-column_name <- "SHL04"
-
-# Exclude "PreferNotAnswer" response
-df_hh_filtered <- df_hh[!(df_hh[[column_name]] %in% c("not_applicable", "do_not_know","prefer_not_to_answer")), ]
-
-# Use table() to tabulate response options
-tabulated_data <- table(df_hh_filtered[[column_name]])
-
-# Calculate the percentage of total for each category
-percentage_data <- prop.table(tabulated_data) * 100
-
-# Combine the tabulated data and percentage data into a data frame
-result_paying_rent_no_stress <- data.frame(
-  ResponseCategory = names(tabulated_data),
-  Count = as.numeric(tabulated_data),
-  Percentage = as.numeric(percentage_data)
-)
-
-# Print or display the result
-print(result_paying_rent_no_stress)
-
-
-# ------------------------------------------------------------------------------
-# % of HHs under pressure to leave
-# ------------------------------------------------------------------------------
-
-# SHL06_SS_UND_PRESSURE - Are you under pressure to leave your accommodation?
-# yes
-# no
-# PreferNotAnswer
-
-column_name <- "SHL06_SS_UND_PRESSURE"
-
-# Exclude "PreferNotAnswer" response
-df_hh_filtered <- df_hh[!(df_hh[[column_name]] %in% c("not_applicable", "do_not_know","prefer_not_to_answer","PreferNotAnswer")), ]
-
-# Use table() to tabulate response options
-tabulated_data <- table(df_hh_filtered[[column_name]])
-
-# Calculate the percentage of total for each category
-percentage_data <- prop.table(tabulated_data) * 100
-
-# Combine the tabulated data and percentage data into a data frame
-result_pressure_to_leave <- data.frame(
-  ResponseCategory = names(tabulated_data),
-  Count = as.numeric(tabulated_data),
-  Percentage = as.numeric(percentage_data)
-)
-
-# Print or display the result
-print(result_pressure_to_leave)
-
-
-# ------------------------------------------------------------------------------
-# Age category
-# ------------------------------------------------------------------------------
-
+## -----------------------------------------------------------------------------
+# Age category adults only
 
 df_hh$DR7.3_NUM_RESP_AGE <- as.numeric(as.character(df_hh$DR7.3_NUM_RESP_AGE))
 
@@ -1266,13 +663,6 @@ df_ind$age_cat <- cut(df_ind$DR.11_NUM_AGE,
 
 table(df_ind$age_cat)
 
-df_ind$
-
-# Population Pyramid
-
-pop_pyramid <- table(df_ind$age_cat, df_ind$female)
-    
-round(prop.table(pop_pyramid,2),2)
 
 # Select all the indicators in one data set:
 # Individual level: 
@@ -1294,7 +684,9 @@ view(df_hh)
 df_hh_export <- df_hh %>%
   select("_index", "DR7.2_SS_RESP_GEN", "DR7.3_NUM_RESP_AGE" , "resp_age_cat",'impact3_3_safety_walking',"outcome4_1_GBV","outcome13_1_bank_account","outcome13_2_income","outcome16_2_social_protection", "outcome9_1_housing", "crowding") 
 
-write.xlsx(df_hh_export, "RMS/household_level_indicators_czech.xlsx", sheetName = "Sheet1", colNames = TRUE, col_labels= TRUE)
+view(df_hh)
+
+write.xlsx(df_hh_export, "RMS/household_level_indicators_hungary.xlsx", sheetName = "Sheet1", colNames = TRUE, col_labels= TRUE)
 
 
 df_ind_export <- df_ind %>%
@@ -1303,13 +695,13 @@ df_ind_export <- df_ind %>%
 
 
 
-write.xlsx(df_ind_export, "RMS/individual_level_indicators_czech.xlsx", sheetName = "Sheet1", colNames = TRUE, col_labels= TRUE)
+write.xlsx(df_ind_export, "RMS/individual_level_indicators_hungary.xlsx", sheetName = "Sheet1", colNames = TRUE, col_labels= TRUE)
 
 
 # import the MSNA VAM dataset, select only the final indicators and merge to the above data
 
-df_hh_vam <- read_excel("VAM/hh_indicators_czech.xlsx")
-df_ind_vam <- read_excel("VAM/ind_indicators_czech.xlsx")
+df_hh_vam <- read_excel("VAM/hh_indicators_hungary.xlsx")
+df_ind_vam <- read_excel("VAM/ind_indicators_hungary.xlsx")
 
 
 df_hh_full <- left_join(df_hh_export, df_hh_vam,
@@ -1323,10 +715,16 @@ df_ind_full <- left_join(df_ind_export, df_ind_vam,
                                "_parent_index" = "_parent_index"))
 
 
+view(df_ind_full)
+
+# write.xlsx(df_ind_full, "Combined/ind_combined_indicators.xlsx", sheetName = "Sheet1", colNames = TRUE, col_labels= TRUE)
+
 
 # ------------------------------------------------------------------------------
-# Disability on household level
+# ADD OTHER INDICATORS 
 # ------------------------------------------------------------------------------
+
+### 1. Disability on household level
 
 df_ind_full$disability <- as.numeric(as.character(df_ind_full$disability))
 
@@ -1353,14 +751,16 @@ pivot_table_summary <- pivot_table_summary %>%
 
 print(pivot_table_summary)
 
-
-# ------------------------------------------------------------------------------
-# Households with children
-# ------------------------------------------------------------------------------
+### 2. Households with children
 
 # Create a dummy of individual level: 
 
 df_ind_full$DR.11_NUM_AGE <- as.numeric(as.character(df_ind_full$DR.11_NUM_AGE))
+
+#  df_ind <- df_ind %>%
+#  mutate(employed = case_when(
+#  SE2_SS_WORK	== "yes" & (DR.11_NUM_AGE > 15 & DR.11_NUM_AGE < 65) ~ 1,
+
 
 df_ind_full <- df_ind_full %>%
     mutate(tag_child = case_when(
@@ -1386,8 +786,13 @@ pivot_table_summary_child <- pivot_table_summary_child %>%
                                               'HH with children'),
                               levels = c(0, 1)))
 
-# print(pivot_table_summary_child)
+print(pivot_table_summary_child)
 
+
+
+
+# df_ind_full <- left_join(df_ind_full, pivot_table_summary,
+#                         by = c("parent_index" = "parent_index"))
 
 # df_ind_full <- left_join(df_ind_full, pivot_table_summary_child,
 #                          by = c("parent_index" = "parent_index"))
@@ -1405,21 +810,62 @@ df_hh_full <- left_join(df_hh_full, pivot_table_summary,
 df_hh_full <- left_join(df_hh_full, pivot_table_summary_child,
                         by = c("_index" = "_index"))
 
+view(df_hh_full)
+
+
+#write.xlsx(df_hh_full, "Combined/hh_combined_indicators.xlsx", sheetName = "Sheet1", colNames = TRUE, col_labels= TRUE)
+
 
  df_ind_full <- df_ind_full %>%
   rename("_parent_index" = "parent_index")
 
 
- 
+#write.xlsx(df_ind_full, "Combined/ind_combined_indicators.xlsx", sheetName = "Sheet1", colNames = TRUE, col_labels= TRUE)
+
 # ------------------------------------------------------------------------------
 # FINAL EXPORT
 # ------------------------------------------------------------------------------
 
-write.xlsx(df_hh_full, "Combined/household_combined_indicators_czech.xlsx", sheetName = "Sheet1", colNames = TRUE, col_labels= TRUE)
+write.xlsx(df_hh_full, "Combined/household_combined_indicators_hungary.xlsx", sheetName = "Sheet1", colNames = TRUE, col_labels= TRUE)
 
 
-write.xlsx(df_ind_full, "Combined/individual_combined_indicators_czech.xlsx", sheetName = "Sheet1", colNames = TRUE, col_labels= TRUE)
+write.xlsx(df_ind_full, "Combined/individual_combined_indicators_hungary.xlsx", sheetName = "Sheet1", colNames = TRUE, col_labels= TRUE)
 
 
+# ------------------------------------------------------------------------------
+# Connect the two datasets / indicators 
 
+
+df_hh_full_table <- df_hh_full %>% 
+  cross_cpct(
+    cell_vars = list(impact3_3_safety_walking, outcome4_1_GBV, outcome13_1_bank_account, outcome13_2_income, outcome16_2_social_protection),
+    col_vars = list(total(), DR7.2_SS_RESP_GEN, resp_age_cat, disability_dummy)
+  ) %>%
+  mutate_if(is.numeric, round, digits = 2)
+
+
+# Individual level: 
+# table(df_ind$impact2_3_health)
+# table(df_ind$impact3_2a)
+# table(df_ind$impact3_2b)
+# table(df_ind$outcome1_2_children_registered)
+# table(df_ind$outcome1_3_legal_documents)
+# table(df_ind$outcome13_3_unemployment)
+
+
+write.xlsx(df_hh_full_table, "Combined/hh_table.xlsx", colNames = TRUE, rowNames = TRUE)
+
+
+df_ind_full_table <- df_ind_full %>% 
+  cross_cpct(
+    cell_vars = list(impact2_3_health, impact3_2a_primary_edu_enrol_rate, impact3_2b_secondary_edu_enrol_rate, outcome1_2_children_registered, outcome1_3_legal_documents, outcome13_3_unemployment),
+    col_vars = list(total(), disability, age_cat)
+    ) %>% 
+  mutate_if(is.numeric, round, digits = 2)
+
+
+write.xlsx(df_ind_full_table, "Combined/ind_table.xlsx", colNames = TRUE, rowNames =TRUE)
+  
+
+      
   
