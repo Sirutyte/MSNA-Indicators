@@ -1397,5 +1397,4 @@ write.xlsx(df_ind_full, "Combined/individual_combined_indicators_czech.xlsx", sh
 
 
 
-
   
