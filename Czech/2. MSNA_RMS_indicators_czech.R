@@ -1270,9 +1270,7 @@ table(df_ind$age_cat)
 
 # Population Pyramid
 
-pop_pyramid <- table(df_ind$age_cat, df_ind$female)
-    
-round(prop.table(pop_pyramid,2),2)
+df_ind %>% group_by(age_cat, female) %>%  count() %>%  ungroup() %>% mutate(per = n/sum(n)*100)
 
 # Select all the indicators in one data set:
 # Individual level: 
