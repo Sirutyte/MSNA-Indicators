@@ -38,8 +38,6 @@ view(df_hh)
 # Read Sheet 2
 df_ind <- read_excel("Data/unhcr_msna_ind_datafile_fin_HU_01122023.xlsx")
 
-
-
 df_ind <-df_ind %>% 
   rename_all(~stringr::str_replace(.,"index","_index"))
 
@@ -100,7 +98,10 @@ df_ind <- df_ind %>%
                             "Without disability" = 0,
                             "With disability" = 1)
   ))
+
 table(df_ind$disability)
+
+round(prop.table(table(df_ind$disability)), 2)
 
 
 # -----------------------------------------------------------------------------
@@ -161,6 +162,8 @@ val_lab(df_hh$FCSCat28) = num_lab("
              3 Acceptable
 ")
 var_label(df_hh$FCSCat28) <- "FCS Categories"
+
+round(prop.table(table(df_hh$FCSCat28)), 2)
 
 
 # -----------------------------------------------------------------------------
@@ -253,6 +256,7 @@ val_lab(df_hh$Max_coping_behaviourEN) = num_lab("
              4 Emergencies coping strategies
 ")
 
+round(prop.table(table(df_hh$Max_coping_behaviourEN)), 2)
 
 # -----------------------------------------------------------------------------
 # REDUCED COPING STRATEGIES INDEX
@@ -350,6 +354,8 @@ df_hh$total_expenditure <- round(rowSums(df_hh[columns_to_sum], na.rm = TRUE), 2
 
 # 1. SHARE OF EXPENDITURE ON FOOD
 df_hh$share_food_expenditure <- round(df_hh$SE.2.1_NUM_FOOD / df_hh$total_expenditure,2)
+
+df_hh %>% summarise(average = mean(share_food_expenditure, na.rm = T))
 
 # 2. SHARE OF EXPENDITURE ON ACCOMMODATION
 df_hh$share_accomm_expenditure <- round(df_hh$SE.2.2_NUM_ACCOM / df_hh$total_expenditure,2)

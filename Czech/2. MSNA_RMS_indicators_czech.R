@@ -533,6 +533,8 @@ df_hh <- df_hh %>%
            )
   )
 
+round(prop.table(table(df_hh$sufficient_dwel_1)), 2)
+
 df_hh <- df_hh %>%
   mutate(sufficient_dwel_2 = case_when(
     SHL07_SM_LIV_COND_no_issues == 1 ~ 1,
@@ -1265,8 +1267,6 @@ df_ind$age_cat <- cut(df_ind$DR.11_NUM_AGE,
 
 
 table(df_ind$age_cat)
-
-df_ind$
 
 # Population Pyramid
 
