@@ -784,14 +784,14 @@ df_hh_full <- left_join(df_hh_full, pivot_table_summary_child,
 view(df_hh_full)
 
 
-#write.xlsx(df_hh_full, "Combined/hh_combined_indicators.xlsx", sheetName = "Sheet1", colNames = TRUE, col_labels= TRUE)
-
+# write.xlsx(df_hh_full, "Combined/hh_combined_indicators.xlsx", sheetName = "Sheet1", colNames = TRUE, col_labels= TRUE)
 
 
 df_ind_full <- df_ind_full %>%
   rename("_parent_index" = "parent_index")
 
-#write.xlsx(df_ind_full, "Combined/ind_combined_indicators.xlsx", sheetName = "Sheet1", colNames = TRUE, col_labels= TRUE)
+# write.xlsx(df_ind_full, "Combined/ind_combined_indicators.xlsx", sheetName = "Sheet1", colNames = TRUE, col_labels= TRUE)
+
 
 # ------------------------------------------------------------------------------
 # FINAL EXPORT
