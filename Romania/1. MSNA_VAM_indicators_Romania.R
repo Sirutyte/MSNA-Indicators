@@ -89,6 +89,8 @@ df_ind <- df_ind %>%
   ))
 table(df_ind$disability)
 
+round(prop.table(table(df_ind$disability)), 2)
+
 
 # -----------------------------------------------------------------------------
 # FOOD CONSUMPTION SCORE
@@ -148,6 +150,8 @@ val_lab(df_hh$FCSCat28) = num_lab("
              3 Acceptable
 ")
 var_label(df_hh$FCSCat28) <- "FCS Categories"
+
+round(prop.table(table(df_hh$FCSCat28)), 2)
 
 
 # -----------------------------------------------------------------------------
@@ -240,6 +244,7 @@ val_lab(df_hh$Max_coping_behaviourEN) = num_lab("
              4 Emergencies coping strategies
 ")
 
+round(prop.table(table(df_hh$Max_coping_behaviourEN)), 2)
 
 # -----------------------------------------------------------------------------
 # REDUCED COPING STRATEGIES INDEX
