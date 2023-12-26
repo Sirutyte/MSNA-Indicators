@@ -103,7 +103,7 @@ df_ind <- df_ind %>% # Those who needed and asked to access healthcare - remove 
 table(df_ind$impact2_3_health)
 
 
-round(prop.table(table(df_ind$impact2_3_health)), 2)
+round(prop.table(table(df_ind$impact2_3_health)), 3)
 
 
 write_xlsx(df_ind, "RMS/final_individual_indicators.xlsx", col_names=TRUE)
@@ -332,7 +332,7 @@ df_ind <- df_ind %>%
 
 table(df_ind$outcome1_3_legal_documents)
 
-round(prop.table(table(df_ind$outcome1_3_legal_documents)), 2)
+round(prop.table(table(df_ind$outcome1_3_legal_documents)), 3)
 
 
 write_xlsx(df_ind, "RMS/final_individual_indicators.xlsx", col_names=TRUE)
@@ -473,6 +473,8 @@ df_ind <- df_ind %>%
     is.na(employed) | is.na(unemployed) ~ NA_real_,
     TRUE ~ 0
   ))
+
+round(prop.table(table(df_ind$labour_force)), 2)
 
 unemployed_sum <- sum(df_ind$unemployed, na.rm = TRUE)
 labour_force_total <- sum(df_ind$labour_force, na.rm = TRUE)
