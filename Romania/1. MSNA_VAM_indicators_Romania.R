@@ -298,14 +298,17 @@ rCSI_table_mean <- df_hh %>%
 # SE.2.5_NUM_COMM - monthly
 # SE.2.6_NUM_HH_BILL - monthly
 # SE.2.7_NUM_OTH - monthly
+# SE.2.0_NUM_HH_EXP - total monthly expenditure - REMOVE INCORRECT
 
 # SE.2.8_NUM_HLTH_6_MTH  -  6 months 
 # SE.2.9_NUM_DEBT - 6 months
 # SE.2.10_NUM_EDU - 12 months 
 
-# Replace multiple specific numeric values (e.g., 9999) with NA in multiple columns
+# Replace 9999 and 99999 with NA in multiple columns
 df_hh <- df_hh %>%
-  mutate(across(c(SE.2.1_NUM_FOOD, SE.2.2_NUM_ACCOM,SE.2.3_NUM_HLTH, SE.2.4_NUM_HYG, SE.2.5_NUM_COMM, SE.2.6_NUM_HH_BILL, SE.2.7_NUM_OTH, SE.2.8_NUM_HLTH_6_MTH, SE.2.9_NUM_DEBT, SE.2.10_NUM_EDU), ~ replace(., . %in% c(9999), NA)))
+  mutate(across(c(SE.2.1_NUM_FOOD, SE.2.2_NUM_ACCOM,SE.2.3_NUM_HLTH, SE.2.4_NUM_HYG, 
+                  SE.2.5_NUM_COMM, SE.2.6_NUM_HH_BILL, SE.2.7_NUM_OTH, SE.2.8_NUM_HLTH_6_MTH, 
+                  SE.2.9_NUM_DEBT, SE.2.10_NUM_EDU), ~ replace(., . %in% c(9999, 99999), NA)))
 
 
 # Check the type of the L9_SS_MIGR column
@@ -328,8 +331,18 @@ df_hh$SE.2.10_NUM_EDU  <- df_hh$SE.2.10_NUM_EDU  / 12
 # TOTAL EXPENDITURE - 1 MONTH
 # df_hh$SE.2.0_NUM_HH_EXP  <- as.numeric(df_hh$SE.2.0_NUM_HH_EXP)
 
-
-# df_hh$total_expenditure <-  round(df_hh$SE.2.1_NUM_FOOD +df_hh$SE.2.2_NUM_ACCOM + df_hh$SE.2.3_NUM_HLTH + df_hh$SE.2.4_NUM_HYG + df_hh$SE.2.5_NUM_COMM + df_hh$SE.2.6_NUM_HH_BILL + df_hh$SE.2.7_NUM_OTH + df_hh$SE.2.8_NUM_HLTH_6_MTH + df_hh$SE.2.9_NUM_DEBT + df_hh$SE.2.10_NUM_EDU + df_hh$SE.2.8_NUM_HLTH_6_MTH + df_hh$SE.2.9_NUM_DEBT + df_hh$SE.2.10_NUM_EDU,2)
+# 
+# # Select the columns you want to sum
+# #columns_to_sum <- c(
+# #  "SE.2.1_NUM_FOOD", "SE.2.2_NUM_ACCOM", "SE.2.3_NUM_HLTH",
+#   "SE.2.4_NUM_HYG", "SE.2.5_NUM_COMM", "SE.2.6_NUM_HH_BILL",
+#   "SE.2.7_NUM_OTH", "SE.2.8_NUM_HLTH_6_MTH", "SE.2.9_NUM_DEBT",
+#   "SE.2.10_NUM_EDU"
+# )
+# 
+# 
+# # Use rowSums to sum the selected columns while ignoring missing values
+# df_hh$total_expenditure <- round(rowSums(df_hh[columns_to_sum], na.rm = TRUE), 2)
 
 # Select the columns you want to sum
 columns_to_sum <- c(
@@ -339,12 +352,24 @@ columns_to_sum <- c(
   "SE.2.10_NUM_EDU"
 )
 
+# Create a logical vector indicating if NAs are present in the specified columns
+na_in_se_columns <- rowSums(is.na(df_hh[, c("SE.2.1_NUM_FOOD", "SE.2.2_NUM_ACCOM", "SE.2.3_NUM_HLTH")])) > 0
+
 # Use rowSums to sum the selected columns while ignoring missing values
 df_hh$total_expenditure <- round(rowSums(df_hh[columns_to_sum], na.rm = TRUE), 2)
 
+# Assign NA to total_expenditure when NAs are present in the specified columns
+df_hh$total_expenditure[na_in_se_columns] <- NA
+
+
+# write_xlsx(df_hh, "VAM/check_expenditure.xlsx")
+
+# df_hh$total_expenditure <-  round(df_hh$SE.2.0_NUM_HH_EXP + df_hh$SE.2.8_NUM_HLTH_6_MTH + df_hh$SE.2.9_NUM_DEBT + df_hh$SE.2.10_NUM_EDU,2)
 
 # 1. SHARE OF EXPENDITURE ON FOOD
 df_hh$share_food_expenditure <- round(df_hh$SE.2.1_NUM_FOOD / df_hh$total_expenditure,2)
+
+df_hh %>% summarise(average = mean(share_food_expenditure, na.rm = T))
 
 # 2. SHARE OF EXPENDITURE ON ACCOMMODATION
 df_hh$share_accomm_expenditure <- round(df_hh$SE.2.2_NUM_ACCOM / df_hh$total_expenditure,2)
@@ -371,8 +396,6 @@ df_hh$share_debt_expenditure <- round(df_hh$SE.2.9_NUM_DEBT / df_hh$total_expend
 # 9. SHARE OF EXPENDITURE ON OTHER
 df_hh$share_other_expenditure <- round(df_hh$SE.2.7_NUM_OTH / df_hh$total_expenditure,2)
 
-
-# write.xlsx(df_hh, "expenditure_2.xlsx")
 
 
 # ------------------------------------------------------------------------------
