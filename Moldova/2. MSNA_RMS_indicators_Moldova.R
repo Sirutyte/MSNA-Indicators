@@ -2,7 +2,7 @@
 ## Clear environment, if needed
 
 rm(list = ls())
-setwd("/Users/irmasirutyte/Desktop/MSNA Composite/MSNA_updated_bulgaria")
+setwd("/Users/irmasirutyte/Desktop/MSNA Composite/MSNA_updated_moldova")
 
 
 library(robotoolbox) # This loads koboloadeR package
@@ -24,16 +24,17 @@ library(writexl)
 library(expss)
 
 
-sheet_names = excel_sheets("Data/bulgaria_multi-sector_needs_assessment_2023_-_latest_version_-_false_-_2023-11-10-08-12-23.xlsx") # get sheet names
+sheet_names = excel_sheets("Data/Renamed for RB final trimmed v2.3.xlsx") # get sheet names
 sheet_names # print sheet names
 
 # Read Sheet 1
-df_hh <- read_excel("Data/bulgaria_multi-sector_needs_assessment_2023_-_latest_version_-_false_-_2023-11-10-08-12-23.xlsx", 
-                    sheet = "Bulgaria Multi-Sector Needs ...")
+df_hh <- read_excel("C:/Users/VONBORST/OneDrive - UNHCR/MSNA Datasets/Moldova/Latest clean dataset/Renamed for RB final trimmed v2.3.xlsx", 
+                    sheet = "HH level ren", skip = 1)
 # View(df_hh)
 
 # Read Sheet 2
-df_ind <- read_excel("Data/slovakia_msna_2023_cleandata.xlsx", sheet = "Info")
+df_ind <- read_excel("C:/Users/VONBORST/OneDrive - UNHCR/MSNA Datasets/Moldova/Latest clean dataset/Renamed for RB final trimmed v2.3.xlsx", 
+                     sheet = "HH ind ren", skip = 1)
 # View(df_ind)
 
 
@@ -111,6 +112,8 @@ write_xlsx(df_ind, "RMS/final_individual_indicators.xlsx", col_names=TRUE)
 # Proportion of Persons of Concern enrolled in primary education (NET ENROLLEMENT RATE) 
 # ------------------------------------------------------------------------------
 
+#NOT AVAILABLE FOR MOLDOVA
+
 # Education	Education
 # E1_SS_ATT_EDU	Is/was your child enrolled and attending formal education (school/kindergarten/nursery) in the Czech Republic in 2022/2023?
 # E2_SM_RES_NO_EDU	What are the reasons your child does not attend school/kindergarten/nursery in the Czech Republic?
@@ -124,35 +127,37 @@ write_xlsx(df_ind, "RMS/final_individual_indicators.xlsx", col_names=TRUE)
 # This means they were doing some distance learning activities at least 4 days per week, for at least 3 hours per day e.g. listening to radio/TV broadcasts, textbook learning, online learning."
 # E7_SS_CONT_DIST_LER	Will they enroll for Ukrainian distance learning in 2023/2024?
 
-df_ind <- df_ind %>%
-  mutate(edu_primary = case_when(
-    (E1_SS_ATT_EDU == "yes") & (DR.11_NUM_AGE > 5 & DR.11_NUM_AGE < 11) ~ 1,  # attending school in person or remote  
-    (E1_SS_ATT_EDU == "no") & (DR.11_NUM_AGE > 5 & DR.11_NUM_AGE < 11) ~ 0,                     # not attending school at all  
-    (E1_SS_ATT_EDU == "PreferNotAnswer") & (DR.11_NUM_AGE > 5 & DR.11_NUM_AGE < 11) ~ NA_real_,
-    TRUE ~ NA_real_)  # default case, added to handle other cases not covered above
-  ) %>%
-  mutate(age_primary = case_when(
-    DR.11_NUM_AGE > 5 & DR.11_NUM_AGE < 11 ~ 1,
-    TRUE ~ NA_real_) 
-  ) %>%
-  mutate(impact3_2a_primary_edu_enrol_rate = sum(edu_primary, na.rm = TRUE) / sum(age_primary, na.rm = TRUE)) %>%
-    mutate(impact3_2a_primary_edu_enrol_rate = round(impact3_2a_primary_edu_enrol_rate, 2)) %>%
-    mutate(impact3_2a_primary_edu_enrol_rate = labelled(impact3_2a_primary_edu_enrol_rate,
-                               labels = c("Yes" = 1, 
-                                          "No" = 0),
-                               label = "Proportion of persons of concern enrolled in primary education"))
-
-
-table(df_ind$impact3_2a_primary_edu_enrol_rate)
-
-
-write_xlsx(df_ind, "RMS/final_individual_indicators.xlsx", col_names = TRUE)
-
+# df_ind <- df_ind %>%
+#   mutate(edu_primary = case_when(
+#     (E1_SS_ATT_EDU == "yes") & (DR.11_NUM_AGE > 5 & DR.11_NUM_AGE < 11) ~ 1,  # attending school in person or remote  
+#     (E1_SS_ATT_EDU == "no") & (DR.11_NUM_AGE > 5 & DR.11_NUM_AGE < 11) ~ 0,                     # not attending school at all  
+#     (E1_SS_ATT_EDU == "PreferNotAnswer") & (DR.11_NUM_AGE > 5 & DR.11_NUM_AGE < 11) ~ NA_real_,
+#     TRUE ~ NA_real_)  # default case, added to handle other cases not covered above
+#   ) %>%
+#   mutate(age_primary = case_when(
+#     DR.11_NUM_AGE > 5 & DR.11_NUM_AGE < 11 ~ 1,
+#     TRUE ~ NA_real_) 
+#   ) %>%
+#   mutate(impact3_2a_primary_edu_enrol_rate = sum(edu_primary, na.rm = TRUE) / sum(age_primary, na.rm = TRUE)) %>%
+#     mutate(impact3_2a_primary_edu_enrol_rate = round(impact3_2a_primary_edu_enrol_rate, 2)) %>%
+#     mutate(impact3_2a_primary_edu_enrol_rate = labelled(impact3_2a_primary_edu_enrol_rate,
+#                                labels = c("Yes" = 1, 
+#                                           "No" = 0),
+#                                label = "Proportion of persons of concern enrolled in primary education"))
+# 
+# 
+# table(df_ind$impact3_2a_primary_edu_enrol_rate)
+# 
+# 
+# write_xlsx(df_ind, "RMS/final_individual_indicators.xlsx", col_names = TRUE)
+# 
 
 # ------------------------------------------------------------------------------
 # 3.2b Core impact indicator
 # Proportion of Persons of Concern enrolled in secondary education (NET ENROLLEMENT RATE) 
 # ------------------------------------------------------------------------------
+
+#NOT AVAILABLE FOR MOLDOVA
 
 # Education	Education
 # E1_SS_ATT_EDU	Is/was your child enrolled and attending formal education (school/kindergarten/nursery) in the Czech Republic in 2022/2023?
@@ -168,28 +173,28 @@ write_xlsx(df_ind, "RMS/final_individual_indicators.xlsx", col_names = TRUE)
 # E7_SS_CONT_DIST_LER	Will they enrol for Ukrainian distance learning in 2023/2024?
 
 
-df_ind <- df_ind %>%
-  mutate(edu_primary = case_when(
-    (E1_SS_ATT_EDU == "yes") & (DR.11_NUM_AGE > 10 & DR.11_NUM_AGE < 16) ~ 1,  # attending in person
-     E1_SS_ATT_EDU == "no" & (DR.11_NUM_AGE > 10 & DR.11_NUM_AGE < 16) ~ 0,     # not attending education at all  
-    (E1_SS_ATT_EDU == "PreferNotAnswer") & (DR.11_NUM_AGE > 10 & DR.11_NUM_AGE < 16) ~ NA_real_,
-    TRUE ~ NA_real_)  # default case, added to handle other cases not covered above
-  ) %>%
-  mutate(age_primary = case_when(
-    DR.11_NUM_AGE > 10 & DR.11_NUM_AGE < 16 ~ 1,
-    TRUE ~ NA_real_)
-  ) %>%
-  mutate(impact3_2b_secondary_edu_enrol_rate = sum(edu_primary, na.rm = TRUE) / sum(age_primary, na.rm = TRUE)) %>%
-  mutate(impact3_2b_secondary_edu_enrol_rate = round(impact3_2b_secondary_edu_enrol_rate, 2)) %>%
-  mutate(impact3_2b_secondary_edu_enrol_rate = labelled(impact3_2b_secondary_edu_enrol_rate,
-                               labels = c("Yes" = 1, 
-                                          "No" = 0),
-                               label = "Proportion of persons of concern enrolled in secondary education"))
-
-
-table(df_ind$impact3_2b_secondary_edu_enrol_rate)
-
-write_xlsx(df_ind, "RMS/final_individual_indicators.xlsx", col_names=TRUE)
+# df_ind <- df_ind %>%
+#   mutate(edu_primary = case_when(
+#     (E1_SS_ATT_EDU == "yes") & (DR.11_NUM_AGE > 10 & DR.11_NUM_AGE < 16) ~ 1,  # attending in person
+#      E1_SS_ATT_EDU == "no" & (DR.11_NUM_AGE > 10 & DR.11_NUM_AGE < 16) ~ 0,     # not attending education at all  
+#     (E1_SS_ATT_EDU == "PreferNotAnswer") & (DR.11_NUM_AGE > 10 & DR.11_NUM_AGE < 16) ~ NA_real_,
+#     TRUE ~ NA_real_)  # default case, added to handle other cases not covered above
+#   ) %>%
+#   mutate(age_primary = case_when(
+#     DR.11_NUM_AGE > 10 & DR.11_NUM_AGE < 16 ~ 1,
+#     TRUE ~ NA_real_)
+#   ) %>%
+#   mutate(impact3_2b_secondary_edu_enrol_rate = sum(edu_primary, na.rm = TRUE) / sum(age_primary, na.rm = TRUE)) %>%
+#   mutate(impact3_2b_secondary_edu_enrol_rate = round(impact3_2b_secondary_edu_enrol_rate, 2)) %>%
+#   mutate(impact3_2b_secondary_edu_enrol_rate = labelled(impact3_2b_secondary_edu_enrol_rate,
+#                                labels = c("Yes" = 1, 
+#                                           "No" = 0),
+#                                label = "Proportion of persons of concern enrolled in secondary education"))
+# 
+# 
+# table(df_ind$impact3_2b_secondary_edu_enrol_rate)
+# 
+# write_xlsx(df_ind, "RMS/final_individual_indicators.xlsx", col_names=TRUE)
 
 
 # ------------------------------------------------------------------------------
@@ -197,27 +202,31 @@ write_xlsx(df_ind, "RMS/final_individual_indicators.xlsx", col_names=TRUE)
 # Proportion of population that feel safe walking alone in their neighbourhood
 # ------------------------------------------------------------------------------
 
+#NOT AVAILABLE FOR MOLDOVA
+
 # PRT06_SS_SAFETY_LVL	- How safe do you feel walking alone in your area/neighbourhood after dark?
 
-df_hh <- df_hh %>%
-  mutate(impact3_3_safety_walking = case_when(
-    PRT06_SS_SAFETY_LVL =="very_safe" | PRT06_SS_SAFETY_LVL =="fairly_safe" ~ 1,
-    PRT06_SS_SAFETY_LVL == "bit_unsafe" | PRT06_SS_SAFETY_LVL == "very_unsafe" ~ 0 , 
-    TRUE ~ NA_real_)
-  ) %>% 
-  mutate(impact3_3_safety_walking = labelled(impact3_3_safety_walking,
-                                             labels = c(
-                                               "Yes"= 1,
-                                               "No"= 0
-                                             ),
-                                             label="Proportion of population that feel safe walking alone in their neighbourhood"))
+# df_hh$P
+# 
+# df_hh <- df_hh %>%
+#   mutate(impact3_3_safety_walking = case_when(
+#     PRT06_SS_SAFETY_LVL =="very_safe" | PRT06_SS_SAFETY_LVL =="fairly_safe" ~ 1,
+#     PRT06_SS_SAFETY_LVL == "bit_unsafe" | PRT06_SS_SAFETY_LVL == "very_unsafe" ~ 0 , 
+#     TRUE ~ NA_real_)
+#   ) %>% 
+#   mutate(impact3_3_safety_walking = labelled(impact3_3_safety_walking,
+#                                              labels = c(
+#                                                "Yes"= 1,
+#                                                "No"= 0
+#                                              ),
+#                                              label="Proportion of population that feel safe walking alone in their neighbourhood"))
+# 
+# table(df_hh$impact3_3_safety_walking)
+# 
+# round(prop.table(table(df_hh$impact3_3_safety_walking)), 2)
 
-table(df_hh$impact3_3_safety_walking)
 
-round(prop.table(table(df_hh$impact3_3_safety_walking)), 2)
-
-
-write_xlsx(df_hh, "RMS/final_household_indicators.xlsx", col_names=TRUE)
+#write_xlsx(df_hh, "RMS/final_household_indicators.xlsx", col_names=TRUE)
 
 
 # ------------------------------------------------------------------------------
@@ -305,7 +314,7 @@ df_ind <- df_ind %>%
 
 table(df_ind$outcome1_3_legal_documents)
 
-round(prop.table(table(df_ind$outcome1_3_legal_documents)), 3)
+round(prop.table(table(df_ind$outcome1_3_legal_documents)), 2)
 
 
 write_xlsx(df_ind, "RMS/final_individual_indicators.xlsx", col_names=TRUE)
@@ -444,7 +453,7 @@ df_ind <- df_ind %>%
     TRUE ~ 0
   ))
 
-round(prop.table(table(df_ind$labour_force)), 3)
+round(prop.table(table(df_ind$labour_force)), 2)
 
 unemployed_sum <- sum(df_ind$unemployed, na.rm = TRUE)
 labour_force_total <- sum(df_ind$labour_force, na.rm = TRUE)
@@ -501,6 +510,8 @@ write_xlsx(df_hh, "RMS/final_household_indicators.xlsx", col_names=TRUE)
 # Proportion of Persons of Concern living in habitable and affordable housing
 # ------------------------------------------------------------------------------
 
+#NOT AVAILABLE FOR MOLDOVA
+
 # We only have the questions for calculating the crowding
 # SHL02_NUM_ROOMS - number of rooms
 # DR8_NUM_HH_SIZE - HH size
@@ -521,60 +532,60 @@ write_xlsx(df_hh, "RMS/final_household_indicators.xlsx", col_names=TRUE)
 # SHL07_SM_LIV_COND_prefer_not_to_say
 
 
-df_hh <- df_hh %>%
-  
-  mutate(crowding = DR8_NUM_HH_SIZE / SHL02_NUM_ROOMS
-  ) %>%
-  mutate(sufficient_dwel_1 =
-           case_when( ## if crowding <= 3, not overcrowded 
-           crowding <= 3 ~ 1, 
-           TRUE ~ 0)
-  )
-
-round(prop.table(table(df_hh$sufficient_dwel_1)), 2)
-
-## classify as habitable when adequate shelter
-
-df_hh <- df_hh %>%
-  mutate(sufficient_dwel_2 = case_when(
-    SHL07_SM_LIV_COND_no_issues == 1 |
-      (SHL07_SM_LIV_COND_unclean_space == 1 | SHL07_SM_LIV_COND_inaccessible_by_transportation == 1) &
-      SHL07_SM_LIV_COND_unable_to_cook_store_food == 0 &
-      SHL07_SM_LIV_COND_lack_of_showers_toilets == 0 &
-      SHL07_SM_LIV_COND_lack_of_hot_water == 0 &
-      SHL07_SM_LIV_COND_do_not_feel_protected == 0 &
-      SHL07_SM_LIV_COND_insufficient_privacy == 0 &
-      SHL07_SM_LIV_COND_unable_to_keep_warm_cool == 0 &
-      SHL07_SM_LIV_COND_unclean_space == 0 &
-      SHL07_SM_LIV_COND_inaccessible_by_transportation == 0 &
-      SHL07_SM_LIV_COND_disposal_of_waste_system == 0 &
-      SHL07_SM_LIV_COND_inaccessible_to_disabled == 0 &
-      SHL07_SM_LIV_COND_insufficient_sleeping_materials == 0 ~ 1,
-      SHL07_SM_LIV_COND_dont_know == 1 | SHL07_SM_LIV_COND_prefer_not_to_say == 1 ~ NA_real_,
-    TRUE ~ 0
-  ))  
-
-
-df_hh <- df_hh %>%
-  
-  mutate(outcome9_1_housing = case_when(
-    sufficient_dwel_1 == 0 | sufficient_dwel_2 == 0  ~ 0, 
-    sufficient_dwel_1 == 1 & sufficient_dwel_2 == 1  ~ 1, 
-    TRUE ~ NA_real_ )
-  ) %>%
-  mutate(outcome9_1_housing = labelled(outcome9_1_housing,
-                                labels = c(
-                                  "Yes" = 1,
-                                  "No" = 0
-                                ),
-                                label = "Proportion of PoCs living in habitable and affordable housing"))
-
-
-table(df_hh$outcome9_1_housing)
-
-round(prop.table(table(df_hh$outcome9_1_housing)), 2)
-
-write_xlsx(df_hh, "RMS/final_household_indicators.xlsx", col_names = TRUE)
+# df_hh <- df_hh %>%
+#   
+#   mutate(crowding = DR8_NUM_HH_SIZE / SHL02_NUM_ROOMS
+#   ) %>%
+#   mutate(sufficient_dwel_1 =
+#            case_when( ## if crowding <= 3, not overcrowded 
+#            crowding <= 3 ~ 1, 
+#            TRUE ~ 0)
+#   )
+# 
+# round(prop.table(table(df_hh$sufficient_dwel_1)), 2)
+# 
+# ## classify as habitable when adequate shelter
+# 
+# df_hh <- df_hh %>%
+#   mutate(sufficient_dwel_2 = case_when(
+#     SHL07_SM_LIV_COND_no_issues == 1 |
+#       (SHL07_SM_LIV_COND_unclean_space == 1 | SHL07_SM_LIV_COND_inaccessible_by_transportation == 1) &
+#       SHL07_SM_LIV_COND_unable_to_cook_store_food == 0 &
+#       SHL07_SM_LIV_COND_lack_of_showers_toilets == 0 &
+#       SHL07_SM_LIV_COND_lack_of_hot_water == 0 &
+#       SHL07_SM_LIV_COND_do_not_feel_protected == 0 &
+#       SHL07_SM_LIV_COND_insufficient_privacy == 0 &
+#       SHL07_SM_LIV_COND_unable_to_keep_warm_cool == 0 &
+#       SHL07_SM_LIV_COND_unclean_space == 0 &
+#       SHL07_SM_LIV_COND_inaccessible_by_transportation == 0 &
+#       SHL07_SM_LIV_COND_disposal_of_waste_system == 0 &
+#       SHL07_SM_LIV_COND_inaccessible_to_disabled == 0 &
+#       SHL07_SM_LIV_COND_insufficient_sleeping_materials == 0 ~ 1,
+#       SHL07_SM_LIV_COND_dont_know == 1 | SHL07_SM_LIV_COND_prefer_not_to_say == 1 ~ NA_real_,
+#     TRUE ~ 0
+#   ))  
+# 
+# 
+# df_hh <- df_hh %>%
+#   
+#   mutate(outcome9_1_housing = case_when(
+#     sufficient_dwel_1 == 0 | sufficient_dwel_2 == 0  ~ 0, 
+#     sufficient_dwel_1 == 1 & sufficient_dwel_2 == 1  ~ 1, 
+#     TRUE ~ NA_real_ )
+#   ) %>%
+#   mutate(outcome9_1_housing = labelled(outcome9_1_housing,
+#                                 labels = c(
+#                                   "Yes" = 1,
+#                                   "No" = 0
+#                                 ),
+#                                 label = "Proportion of PoCs living in habitable and affordable housing"))
+# 
+# 
+# table(df_hh$outcome9_1_housing)
+# 
+# round(prop.table(table(df_hh$outcome9_1_housing)), 2)
+# 
+# write_xlsx(df_hh, "RMS/final_household_indicators.xlsx", col_names = TRUE)
 
 
 # ------------------------------------------------------------------------------
@@ -616,26 +627,25 @@ round(prop.table(table(df_ind$outcome10_1_measles)), 2)
 
 ### SAME LOGIC FOR POLIO 
 
-#not available for Bulgaria
 
-#df_ind <- df_ind %>%
-#  mutate(outcome10_1_polio = case_when(
-#    H6_SS_HLTH_VACCINE_POLIO == "1_dose" | H6_SS_HLTH_VACCINE_POLIO == "2_doses" | H6_SS_HLTH_VACCINE_POLIO == "3_doses" | H6_SS_HLTH_VACCINE_POLIO == "4_doses" ~ 1, 
-#    H6_SS_HLTH_VACCINE_POLIO == "0_none"  | H6_SS_HLTH_VACCINE_POLIO == "DoNotKnow" | H6_SS_HLTH_VACCINE_POLIO == "PreferNotAnswer" ~ 0,
-#    TRUE ~ NA_real_
-#  )) %>%
-#  mutate(outcome10_1_polio = labelled(outcome10_1_polio,
-#                                        labels = c(
-#                                          "Yes" = 1,
-#                                           "No" = 0
-#                                        ),
-#                                        label = "Proportion of children aged 9 months to five years who have received polio vaccination*"))
-
+df_ind <- df_ind %>%
+  mutate(outcome10_1_polio = case_when(
+    H6_SS_HLTH_VACCINE_POLIO == "1_dose" | H6_SS_HLTH_VACCINE_POLIO == "2_doses" | H6_SS_HLTH_VACCINE_POLIO == "3_doses" | H6_SS_HLTH_VACCINE_POLIO == "4_doses" ~ 1, 
+    H6_SS_HLTH_VACCINE_POLIO == "0_none"  | H6_SS_HLTH_VACCINE_POLIO == "DoNotKnow" | H6_SS_HLTH_VACCINE_POLIO == "PreferNotAnswer" ~ 0,
+    TRUE ~ NA_real_
+  )) %>%
+  mutate(outcome10_1_polio = labelled(outcome10_1_polio,
+                                        labels = c(
+                                          "Yes" = 1,
+                                           "No" = 0
+                                        ),
+                                        label = "Proportion of children aged 9 months to five years who have received polio vaccination*"))
 
 
-#table(df_ind$outcome10_1_polio)
 
-#round(prop.table(table(df_ind$outcome10_1_polio)), 2)
+table(df_ind$outcome10_1_polio)
+
+round(prop.table(table(df_ind$outcome10_1_polio)), 2)
 
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
@@ -697,69 +707,74 @@ df_hh %>% filter(!is.na(DR8_NUM_HH_SIZE)) %>% summarise(mean = mean(DR8_NUM_HH_S
 # ------------------------------------------------------------------------------
 # % of children reported to attend early childhood education and care services in host country 
 # ------------------------------------------------------------------------------
+
+#NOT AVAILABLE FOR MOLDOVA
+
 # 2 to 5 years old 
 
-# Column name for education attendance
-column_name <- 'E5_SS_EARLY_EDU'
-
-# Exclude "PreferNotAnswer" response and create a new dataset
-df_ind_early <- df_ind[!(df_ind[[column_name]] %in% c("prefer_not_to_answer", "dont_know","PreferNotAnswer","not_sure","DoNotKnow")), ]
-
-# Use table() to tabulate response options
-tabulated_data <- table(df_ind_early[[column_name]])
-
-# Calculate the percentage of total for each category
-percentage_data <- prop.table(tabulated_data) * 100
-
-# Combine the tabulated data and percentage data into a data frame
-attending_early_education <- data.frame(
-  ResponseCategory = names(tabulated_data),
-  Count = as.numeric(tabulated_data),
-  Percentage = as.numeric(percentage_data)
-)
-
-# Print or display the result
-print(attending_early_education)
-
-# View the original df_ind dataset
-view(df_ind)
+# # Column name for education attendance
+# column_name <- 'E5_SS_EARLY_EDU'
+# 
+# # Exclude "PreferNotAnswer" response and create a new dataset
+# df_ind_early <- df_ind[!(df_ind[[column_name]] %in% c("prefer_not_to_answer", "dont_know","PreferNotAnswer","not_sure","DoNotKnow")), ]
+# 
+# # Use table() to tabulate response options
+# tabulated_data <- table(df_ind_early[[column_name]])
+# 
+# # Calculate the percentage of total for each category
+# percentage_data <- prop.table(tabulated_data) * 100
+# 
+# # Combine the tabulated data and percentage data into a data frame
+# attending_early_education <- data.frame(
+#   ResponseCategory = names(tabulated_data),
+#   Count = as.numeric(tabulated_data),
+#   Percentage = as.numeric(percentage_data)
+# )
+# 
+# # Print or display the result
+# print(attending_early_education)
+# 
+# # View the original df_ind dataset
+# view(df_ind)
 
 # ------------------------------------------------------------------------------
 # % of school-aged children accessing Ukrainian distance learning
 # ------------------------------------------------------------------------------
 
-unique_responses <- unique(df_ind$E6_SS_DIST_LER)
-print(unique_responses)
+#NOT AVAILABLE FOR MOLDOVA
 
-df_ind <- df_ind %>%
-  mutate(distant_learning_grouped = case_when(
-    E6_SS_DIST_LER == "no"  ~ 0, 
-    E6_SS_DIST_LER %in% paste0("grade_", 1:12) & (DR.11_NUM_AGE > 5 & DR.11_NUM_AGE < 16) ~ 1, 
-    E6_SS_DIST_LER == "PreferNotAnswer"  ~ NA_real_ , 
-    TRUE ~ NA_real_
-  )) %>%
-  mutate(distant_learning_grouped = labelled(distant_learning_grouped,
-                                             labels = c(
-                                               "Yes" = 1,
-                                               "No" = 0
-                                             ),
-                                             label = "Accessing Ukrainian distant learning"))
-
-
-round(prop.table(table(df_ind$distant_learning_grouped)), 2)
-
-# attending both distant learning and school in host country
-
-df_ind <- df_ind %>%
-  mutate(attending_both_education = case_when(
-    (distant_learning_grouped == 1 & E1_SS_ATT_EDU == "yes") & (DR.11_NUM_AGE > 5 & DR.11_NUM_AGE < 16) ~ 1,
-    (DR.11_NUM_AGE > 5 & DR.11_NUM_AGE < 16) ~ 0,
-    TRUE ~ NA_real_
-  ))
-
-table(df_ind$attending_both_education)
-
-round(prop.table(table(df_ind$attending_both_education)), 3)
+# unique_responses <- unique(df_ind$E6_SS_DIST_LER)
+# print(unique_responses)
+# 
+# df_ind <- df_ind %>%
+#   mutate(distant_learning_grouped = case_when(
+#     E6_SS_DIST_LER == "no"  ~ 0, 
+#     E6_SS_DIST_LER %in% paste0("grade_", 1:12) & (DR.11_NUM_AGE > 5 & DR.11_NUM_AGE < 16) ~ 1, 
+#     E6_SS_DIST_LER == "PreferNotAnswer"  ~ NA_real_ , 
+#     TRUE ~ NA_real_
+#   )) %>%
+#   mutate(distant_learning_grouped = labelled(distant_learning_grouped,
+#                                              labels = c(
+#                                                "Yes" = 1,
+#                                                "No" = 0
+#                                              ),
+#                                              label = "Accessing Ukrainian distant learning"))
+# 
+# 
+# round(prop.table(table(df_ind$distant_learning_grouped)), 2)
+# 
+# # attending both distant learning and school in host country
+# 
+# df_ind <- df_ind %>%
+#   mutate(attending_both_education = case_when(
+#     (distant_learning_grouped == 1 & E1_SS_ATT_EDU == "yes") & (DR.11_NUM_AGE > 5 & DR.11_NUM_AGE < 16) ~ 1,
+#     (DR.11_NUM_AGE > 5 & DR.11_NUM_AGE < 16) ~ 0,
+#     TRUE ~ NA_real_
+#   ))
+# 
+# table(df_ind$attending_both_education)
+# 
+# round(prop.table(table(df_ind$attending_both_education)), 2)
 
 
 #write_xlsx(df_ind, "check_education.xlsx", col_names = TRUE)
@@ -768,14 +783,10 @@ round(prop.table(table(df_ind$attending_both_education)), 3)
 # PREFERRED INFORMATION CHANNELS TOP 3
 # ------------------------------------------------------------------------------
 
+df_hh$AAP.3_SM_PRF_INFO_CHNL
 
 df_hh %>%
-  select(AAP.3_SM_PRF_INFO_CHNL_phone_call_helpline, AAP.3_SM_PRF_INFO_CHNL_sms, AAP.3_SM_PRF_INFO_CHNL_messenger,
-         AAP.3_SM_PRF_INFO_CHNL_viber, AAP.3_SM_PRF_INFO_CHNL_facebook, AAP.3_SM_PRF_INFO_CHNL_telegram,
-         AAP.3_SM_PRF_INFO_CHNL_whatsapp, AAP.3_SM_PRF_INFO_CHNL_signal, AAP.3_SM_PRF_INFO_CHNL_tv,
-         AAP.3_SM_PRF_INFO_CHNL_newspapers_magazines, AAP.3_SM_PRF_INFO_CHNL_billboards_posters,
-         AAP.3_SM_PRF_INFO_CHNL_leaflets, AAP.3_SM_PRF_INFO_CHNL_face_to_face, AAP.3_SM_PRF_INFO_CHNL_email, 
-         AAP.3_SM_PRF_INFO_CHNL_official_websites) %>%
+  select(starts_with("AAP.3_SM_PRF_INFO_CHNL_")) %>%
   pivot_longer(cols = everything(),
                names_to = "variable",
                values_to = "answer") %>%
@@ -819,17 +830,18 @@ df_hh_filtered_needs %>%
 # % of respondents reporting awareness of protection services in the area they are residing
 # ------------------------------------------------------------------------------
 
+#NOT AVAILABLE FOR MOLDOVA
 
-df_hh <- df_hh %>%
-  mutate(protection_services_awareness = case_when(
-    PRT03_SM_AVL_SRV == "none_of_the_above" | PRT03_SM_AVL_SRV == "dont_know" ~ 0,
-    PRT03_SM_AVL_SRV != "none_of_the_above" & PRT03_SM_AVL_SRV != "dont_know" ~ 1,
-    TRUE ~ NA_real_
-  ))
-
-table(df_hh$protection_services_awareness)
-
-round(prop.table(table(df_hh$protection_services_awareness)), 2)
+# df_hh <- df_hh %>%
+#   mutate(protection_services_awareness = case_when(
+#     PRT03_SM_AVL_SRV == "none_of_the_above" | PRT03_SM_AVL_SRV == "dont_know" ~ 0,
+#     PRT03_SM_AVL_SRV != "none_of_the_above" & PRT03_SM_AVL_SRV != "dont_know" ~ 1,
+#     TRUE ~ NA_real_
+#   ))
+# 
+# table(df_hh$protection_services_awareness)
+# 
+# round(prop.table(table(df_hh$protection_services_awareness)), 2)
 
 
 #write_xlsx(df_hh, "check_awareness.xlsx", col_names = TRUE)
@@ -841,7 +853,7 @@ round(prop.table(table(df_hh$protection_services_awareness)), 2)
 # GBV02_SM_GBV_BARR - multi-response question
 # remove GBV02_SM_GBV_BARR_no_need_to_check
 
-df_hh_filtered_gbv <- filter(df_hh, GBV02_SM_GBV_BARR_no_need_to_check != 1 & GBV02_SM_GBV_BARR_prefer_not_to_answer !=1)
+df_hh_filtered_gbv <- filter(df_hh, GBV02_SM_GBV_BARR_no_need_to_check != 1)
 
 df_hh_filtered_gbv %>%
   select(starts_with("GBV02_SM_GBV_BARR")) %>%
@@ -923,7 +935,7 @@ print(work_contract)
 # H4_SM_HLTH_ACC_BARRIER
 
 df_ind %>%
-  select(starts_with("H4_SM_HLTH_ACC_BARRIER")) %>%
+  select(starts_with("H4_SM_HLTH_ACC_BARRIER")) %>% filter(H4_SM_HLTH_ACC_BARRIER_no_answer !=1) %>% 
   mutate(across(everything(), as.character)) %>%
   pivot_longer(cols = everything(),
                names_to = "variable",
@@ -970,42 +982,44 @@ print(result_df)
 # % of HHs with children, who do not belong to the nuclear family/families in the HH
 # ------------------------------------------------------------------------------
 
+#NOT AVAILABLE FOR MOLDOVA
+
 # Use this CP2_SS_BLG_NF (all minus "yes_nuclear_family" and exclude non-response )
 
 # Use unique() on a specific column
-unique_values_column1 <- unique(df_ind$CP2_SS_BLG_NF)
-# Print the unique values from column1
-print(unique_values_column1)
-
-# create tag - yes_nuclear_family
-df_ind <- df_ind %>%
-  mutate(children_no_nuclear_family = case_when(
-    CP2_SS_BLG_NF == "yes_nuclear_family" ~ 0, # is part of nuclear family
-    CP2_SS_BLG_NF != "yes_nuclear_family" & !is.na(CP2_SS_BLG_NF) & CP2_SS_BLG_NF != "DoNotKnow" & CP2_SS_BLG_NF != "PreferNotAnswer" ~ 1,  # do not belong to the nuclear family (and not NA)
-    TRUE ~ NA_real_
-  ))
-
-table(df_ind$children_no_nuclear_family)
-
-
-# Exclude "PreferNotAnswer" response
-df_ind_filtered <- df_ind[df_ind$children_no_nuclear_family != "DoNotKnow", ]
-
-# Use table() to tabulate response options
-tabulated_data <- table(df_ind_filtered$children_no_nuclear_family)
-
-# Calculate the percentage of total for each category
-percentage_data <- prop.table(tabulated_data) * 100
-
-# Combine the tabulated data and percentage data into a data frame
-result_children_no_family <- data.frame(
-  ResponseCategory = names(tabulated_data),
-  Count = as.numeric(tabulated_data),
-  Percentage = as.numeric(percentage_data)
-)
-
-# Print or display the result
-print(result_children_no_family)
+# unique_values_column1 <- unique(df_ind$CP2_SS_BLG_NF)
+# # Print the unique values from column1
+# print(unique_values_column1)
+# 
+# # create tag - yes_nuclear_family
+# df_ind <- df_ind %>%
+#   mutate(children_no_nuclear_family = case_when(
+#     CP2_SS_BLG_NF == "yes_nuclear_family" ~ 0, # is part of nuclear family
+#     CP2_SS_BLG_NF != "yes_nuclear_family" & !is.na(CP2_SS_BLG_NF) & CP2_SS_BLG_NF != "DoNotKnow" & CP2_SS_BLG_NF != "PreferNotAnswer" ~ 1,  # do not belong to the nuclear family (and not NA)
+#     TRUE ~ NA_real_
+#   ))
+# 
+# table(df_ind$children_no_nuclear_family)
+# 
+# 
+# # Exclude "PreferNotAnswer" response
+# df_ind_filtered <- df_ind[df_ind$children_no_nuclear_family != "DoNotKnow", ]
+# 
+# # Use table() to tabulate response options
+# tabulated_data <- table(df_ind_filtered$children_no_nuclear_family)
+# 
+# # Calculate the percentage of total for each category
+# percentage_data <- prop.table(tabulated_data) * 100
+# 
+# # Combine the tabulated data and percentage data into a data frame
+# result_children_no_family <- data.frame(
+#   ResponseCategory = names(tabulated_data),
+#   Count = as.numeric(tabulated_data),
+#   Percentage = as.numeric(percentage_data)
+# )
+# 
+# # Print or display the result
+# print(result_children_no_family)
 
 # ------------------------------------------------------------------------------
 # % of HHs who would report inappropriate behaviour from an aid worker
@@ -1020,7 +1034,7 @@ print(result_children_no_family)
 column_name <- "PSEA3_SS_BHV_RPT"
 
 # Exclude "PreferNotAnswer" response
-df_hh_filtered <- df_hh[!(df_hh[[column_name]] %in% c("DoNotKnow", "PreferNotAnswer")), ]
+df_hh_filtered <- df_hh[!(df_hh[[column_name]] %in% c("do_not_know", "no_answer")), ]
 
 # Use table() to tabulate response options
 tabulated_data <- table(df_hh_filtered[[column_name]])
@@ -1077,6 +1091,9 @@ print(result_accommodation_type )
 # ------------------------------------------------------------------------------
 # % HHs with of youth (age 15-24 years) not in education, employment or training
 # ------------------------------------------------------------------------------
+
+#NOT AVAILABLE FOR MOLDOVA
+
 # 16 to 24 inclusive - that's the data we have for employment
 
 
@@ -1096,18 +1113,18 @@ print(result_accommodation_type )
 # Not attending training: SE8_SS_ACTIVITY !=professional_training | SE8_SS_ACTIVITY !=professional_training = studying
 # Education only in host country?? because now we are removing those who might be attending only online
 
-df_ind <- df_ind %>%  
-  mutate(inactive_youth = case_when(     
-    (employed != 1 & E1_SS_ATT_EDU != "yes" & !(SE8_SS_ACTIVITY %in% c("professional_training", "studying")) & (DR.11_NUM_AGE > 15 & DR.11_NUM_AGE <= 24)) ~ 1,    
-    (employed == 1 | E1_SS_ATT_EDU == "yes" | SE8_SS_ACTIVITY %in% c("professional_training", "studying")) & (DR.11_NUM_AGE > 15 & DR.11_NUM_AGE <= 24) ~ 0,      
-    TRUE ~ NA_real_   ))
-
-df_selected <- df_ind %>%
-  select(DR.11_NUM_AGE, employed,E1_SS_ATT_EDU, SE8_SS_ACTIVITY,inactive_youth)
-
-view(df_selected)
-
-round(prop.table(table(df_ind$inactive_youth)), 2)
+# df_ind <- df_ind %>%  
+#   mutate(inactive_youth = case_when(     
+#     (employed != 1 & E1_SS_ATT_EDU != "yes" & !(SE8_SS_ACTIVITY %in% c("professional_training", "studying")) & (DR.11_NUM_AGE > 15 & DR.11_NUM_AGE <= 24)) ~ 1,    
+#     (employed == 1 | E1_SS_ATT_EDU == "yes" | SE8_SS_ACTIVITY %in% c("professional_training", "studying")) & (DR.11_NUM_AGE > 15 & DR.11_NUM_AGE <= 24) ~ 0,      
+#     TRUE ~ NA_real_   ))
+# 
+# df_selected <- df_ind %>%
+#   select(DR.11_NUM_AGE, employed,E1_SS_ATT_EDU, SE8_SS_ACTIVITY,inactive_youth)
+# 
+# view(df_selected)
+# 
+# round(prop.table(table(df_ind$inactive_youth)), 2)
 
 # write_xlsx(df_ind, "check_inactive_youth.xlsx", col_names = TRUE)
 
@@ -1150,7 +1167,7 @@ print(result_paying_rent_no_stress)
 column_name <- "SHL06_SS_UND_PRESSURE"
 
 # Exclude "PreferNotAnswer" response
-df_hh_filtered <- df_hh[!(df_hh[[column_name]] %in% c("not_applicable", "do_not_know","prefer_not_to_answer","PreferNotAnswer")), ]
+df_hh_filtered <- df_hh[!(df_hh[[column_name]] %in% c("not_applicable", "do_not_know","prefer_not_to_answer","PreferNotAnswer", "no_answer")), ]
 
 # Use table() to tabulate response options
 tabulated_data <- table(df_hh_filtered[[column_name]])
@@ -1195,9 +1212,9 @@ table(df_ind$age_cat)
 
 # Population Pyramid
 
-pop_pyramid <- table(df_ind$age_cat, df_ind$female)
+pop_pyramid <- table(df_ind$age_cat, df_ind$DR.12_SS_GEN)
 
-df_ind %>% group_by(age_cat, female) %>%  count() %>%  ungroup() %>% mutate(per = n/sum(n)*100)
+df_ind %>% filter(DR.12_SS_GEN != "no_answer") %>%  group_by(age_cat, DR.12_SS_GEN) %>%  count() %>%  ungroup() %>% mutate(per = n/sum(n)*100)
 
 
 # Select all the indicators in one data set:
@@ -1219,20 +1236,20 @@ df_ind %>% group_by(age_cat, female) %>%  count() %>%  ungroup() %>% mutate(per 
 df_hh_export <- df_hh %>%
   select("_index", "DR7.2_SS_RESP_GEN", "DR7.3_NUM_RESP_AGE" , "resp_age_cat",'impact3_3_safety_walking',"outcome4_1_GBV","outcome13_1_bank_account","outcome13_2_income","outcome16_2_social_protection","crowding") 
 
-write.xlsx(df_hh_export, "RMS/household_level_indicators_bulgaria.xlsx", sheetName = "Sheet1", colNames = TRUE, col_labels= TRUE)
+write.xlsx(df_hh_export, "RMS/household_level_indicators_moldova.xlsx", sheetName = "Sheet1", colNames = TRUE, col_labels= TRUE)
 
 
 df_ind_export <- df_ind %>%
   select("_parent_index", "_index", "DR.12_SS_GEN","DR.11_NUM_AGE","age_cat", "DR.13_SS_REL","impact2_3_health","impact3_2a_primary_edu_enrol_rate","impact3_2b_secondary_edu_enrol_rate",
          "outcome1_2_children_registered","outcome1_3_legal_documents","outcome13_3_unemployment", "outcome10_1_polio","outcome10_1_measles")
 
-write.xlsx(df_ind_export, "RMS/individual_level_indicators_bulgaria.xlsx", sheetName = "Sheet1", colNames = TRUE, col_labels= TRUE)
+write.xlsx(df_ind_export, "RMS/individual_level_indicators_moldova.xlsx", sheetName = "Sheet1", colNames = TRUE, col_labels= TRUE)
 
 
 # import the MSNA VAM dataset, select only the final indicators and merge to the above data
 
-df_hh_vam <- read_excel("VAM/hh_indicators_bulgaria.xlsx")
-df_ind_vam <- read_excel("VAM/ind_indicators_bulgaria.xlsx")
+df_hh_vam <- read_excel("VAM/hh_indicators_moldova.xlsx")
+df_ind_vam <- read_excel("VAM/ind_indicators_moldova.xlsx")
 
 
 df_hh_full <- left_join(df_hh_export, df_hh_vam,
@@ -1353,8 +1370,8 @@ df_ind_full <- df_ind_full %>%
 # FINAL EXPORT
 # ------------------------------------------------------------------------------
 
-write.xlsx(df_hh_full, "Combined/household_combined_indicators_bulgaria.xlsx", sheetName = "Sheet1", colNames = TRUE, col_labels= TRUE)
+write.xlsx(df_hh_full, "Combined/household_combined_indicators_moldova.xlsx", sheetName = "Sheet1", colNames = TRUE, col_labels= TRUE)
 
 
-write.xlsx(df_ind_full, "Combined/individual_combined_indicators_bulgaria.xlsx", sheetName = "Sheet1", colNames = TRUE, col_labels= TRUE)
+write.xlsx(df_ind_full, "Combined/individual_combined_indicators_moldova.xlsx", sheetName = "Sheet1", colNames = TRUE, col_labels= TRUE)
 

@@ -1,7 +1,7 @@
 
 ## Clear environment, if needed
 rm(list = ls())
-setwd("/Users/irmasirutyte/Desktop/MSNA Composite/MSNA_updated_bulgaria")
+setwd("/Users/irmasirutyte/Desktop/MSNA Composite/MSNA_updated_moldova")
 
 ## Libraries
 
@@ -24,18 +24,19 @@ library(writexl)
 library(expss)
 
 
-sheet_names = excel_sheets("Data/bulgaria_multi-sector_needs_assessment_2023_-_latest_version_-_false_-_2023-11-10-08-12-23.xlsx") # get sheet names
+sheet_names = excel_sheets("Data/Renamed for RB final trimmed v2.3.xlsx") # get sheet names
 sheet_names # print sheet names
 
 # Read Sheet 1
-df_hh <- read_excel("Data/bulgaria_multi-sector_needs_assessment_2023_-_latest_version_-_false_-_2023-11-10-08-12-23.xlsx", 
-                    sheet = "Bulgaria Multi-Sector Needs ...")
+df_hh <- read_excel("C:/Users/VONBORST/OneDrive - UNHCR/MSNA Datasets/Moldova/Latest clean dataset/Renamed for RB final trimmed v2.3.xlsx", 
+                    sheet = "HH level ren", skip = 1)
 # View(df_hh)
 
-
 # Read Sheet 2
-df_ind <- read_excel("Data/slovakia_msna_2023_cleandata.xlsx", sheet = "Info")
+df_ind <- read_excel("C:/Users/VONBORST/OneDrive - UNHCR/MSNA Datasets/Moldova/Latest clean dataset/Renamed for RB final trimmed v2.3.xlsx", 
+                     sheet = "HH ind ren", skip = 1)
 # View(df_ind)
+
 
 
 # ------------------------------------------------------------------------------
@@ -92,7 +93,7 @@ df_ind <- df_ind %>%
 
 table(df_ind$disability)
 
-round(prop.table(table(df_ind$disability)), 3)
+round(prop.table(table(df_ind$disability)), 2)
 
 
 # -----------------------------------------------------------------------------
@@ -406,12 +407,12 @@ df_hh$share_other_expenditure <- round(df_hh$SE.2.7_NUM_OTH / df_hh$total_expend
 df_hh_export <- df_hh %>%
   select("_index", "FCS","FCSCat21", "stress_coping_EN", "emergency_coping_EN", "crisis_coping_EN", "Max_coping_behaviourEN", "rCSI", "total_expenditure", "share_food_expenditure","share_accomm_expenditure", "share_health_expenditure","share_hygiene_expenditure","share_communication_expenditure","share_hh_bills_expenditure","share_education_expenditure","share_debt_expenditure","share_other_expenditure" ) 
 
-write.xlsx(df_hh_export, "VAM/hh_indicators_bulgaria.xlsx")
+write.xlsx(df_hh_export, "VAM/hh_indicators_moldova.xlsx")
 
 
 df_ind_export <- df_ind %>%
   select("_index","_parent_index","disability") 
 
-write.xlsx(df_ind_export, "VAM/ind_indicators_bulgaria.xlsx")
+write.xlsx(df_ind_export, "VAM/ind_indicators_moldova.xlsx")
 
 
