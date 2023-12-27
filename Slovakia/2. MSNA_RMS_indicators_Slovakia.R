@@ -66,6 +66,9 @@ df_ind <- read_excel("Data/slovakia_msna_2023_cleandata.xlsx", sheet = "Info")
 # Numerator: Population who have received the asked for health services in the previous 30 days
 # Denominator: Total population who have asked for health services in the previous 30 days
 
+class(df_ind$H4_SM_HLTH_ACC_BARRIER_wanted_to_wait_and_see_if_the_problem_go_better)
+
+
 df_ind <- df_ind %>% # Those who were able to access healthcare
   mutate(health_access = case_when(
     H3_SS_HLTH_OBTAIN_CARE == "yes"  ~ 1,
@@ -74,26 +77,20 @@ df_ind <- df_ind %>% # Those who were able to access healthcare
     TRUE ~ 0)
   ) 
 
-df_ind <- df_ind %>% # Those who needed and asked to access healthcare
+df_ind <- df_ind %>% # Those who needed and asked to access healthcare - remove those who didn't try to access healthcare for some reasons
   mutate(health_need = case_when(
+    H1_SS_HLTH_PBLM == "yes" & H3_SS_HLTH_OBTAIN_CARE == "no" & H4_SM_HLTH_ACC_BARRIER == "wanted_to_wait_and_see_if_the_problem_go_better" ~ 0, 
+    H1_SS_HLTH_PBLM == "yes" & H3_SS_HLTH_OBTAIN_CARE == "no" & H4_SM_HLTH_ACC_BARRIER == "do_not_trust_local_provider" ~ 0, 
+    H1_SS_HLTH_PBLM == "yes" & H3_SS_HLTH_OBTAIN_CARE == "no" & H4_SM_HLTH_ACC_BARRIER == "fear_or_distrust_of_HW_EXAM_treatment" ~ 0, 
+    H1_SS_HLTH_PBLM == "yes" & H3_SS_HLTH_OBTAIN_CARE == "no" & H4_SM_HLTH_ACC_BARRIER == "other" ~ 0, 
     H1_SS_HLTH_PBLM == "yes" ~ 1,
-   (H1_SS_HLTH_PBLM == "yes" & H3_SS_HLTH_OBTAIN_CARE == "no" & (H4_SM_HLTH_ACC_BARRIER_wanted_to_wait_and_see_if_the_problem_go_better == "1" | H4_SM_HLTH_ACC_BARRIER_other =="1" )) ~ 0, 
     H1_SS_HLTH_PBLM == "DoNotKnow" ~ NA_real_,
     H1_SS_HLTH_PBLM == "PreferNotAnswer" ~ NA_real_,
-    TRUE ~ 0)
-  ) 
-
-df_ind <- df_ind %>% ## Add up who needed services ( both who accessed and did not access)
-  mutate(impact2_3_health = health_access / health_need 
-  ) %>%
-  mutate(impact2_3_health = case_when(
-    impact2_3_health == 1 ~ 1, 
-    impact2_3_health == 0.5 ~ 0,
-    impact2_3_health == 0 ~ 0, 
-    TRUE ~ NA_real_ )
-  ) %>%
+    TRUE ~ 0
+  )) %>%
+  mutate(impact2_3_health = health_access / health_need) %>%
   mutate(impact2_3_health = labelled(impact2_3_health,
-                                     labels =c(
+                                     labels = c (
                                        "Yes"= 1,
                                        "No"= 0
                                      ),
@@ -102,7 +99,8 @@ df_ind <- df_ind %>% ## Add up who needed services ( both who accessed and did n
 
 table(df_ind$impact2_3_health)
 
-round(prop.table(table(df_ind$impact2_3_health)), 2)
+
+round(prop.table(table(df_ind$impact2_3_health)), 3)
 
 write_xlsx(df_ind, "RMS/final_individual_indicators.xlsx", col_names=TRUE)
 
@@ -445,6 +443,8 @@ df_ind <- df_ind %>%
     TRUE ~ 0
   ))
 
+round(prop.table(table(df_ind$labour_force)), 2)
+
 unemployed_sum <- sum(df_ind$unemployed, na.rm = TRUE)
 labour_force_total <- sum(df_ind$labour_force, na.rm = TRUE)
 
@@ -785,7 +785,9 @@ df_hh %>%
 # Preferred means of providing feedback to aid providers about the quality, quantity and approriateness of aid
 # ------------------------------------------------------------------------------
 
-df_hh %>%
+df_hh_filtered_feedback <- filter(df_hh, AAP.5_SM_TOP_NEEDS_no_needs  != 1 & AAP.4_SM_PRF_FEEDBACK_prefer_not_to_answer!= 1 & AAP.4_SM_PRF_FEEDBACK_dont_know !=1 )
+
+df_hh_filtered_feedback %>%
   select(starts_with("AAP.4_SM_PRF_FEEDBACK")) %>%
   mutate(across(everything(), as.character)) %>%
   pivot_longer(cols = everything(),
@@ -855,7 +857,7 @@ df_hh_filtered_gbv %>%
 
 # SE12_SM_EMP_BARR
 
-df_hh_filtered_difficulty_work <- filter(df_ind, SE12_SM_EMP_BARR_none  != 1)
+df_hh_filtered_difficulty_work <- filter(df_ind, SE12_SM_EMP_BARR_none  != 1 & SE12_SM_EMP_BARR_prefer_not_to_answer != 1)
 
 
 df_hh_filtered_difficulty_work %>%
@@ -968,13 +970,16 @@ print(result_df)
 
 # Use this CP2_SS_BLG_NF (all minus "yes_nuclear_family" and exclude non-response )
 
+# Use unique() on a specific column
+unique_values_column1 <- unique(df_ind$CP2_SS_BLG_NF)
+# Print the unique values from column1
+print(unique_values_column1)
 
 # create tag - yes_nuclear_family
 df_ind <- df_ind %>%
   mutate(children_no_nuclear_family = case_when(
     CP2_SS_BLG_NF == "yes_nuclear_family" ~ 0, # is part of nuclear family
-    CP2_SS_BLG_NF != "yes_nuclear_family" & !is.na(CP2_SS_BLG_NF) ~ 1,  # do not belong to the nuclear family (and not NA)
-    CP2_SS_BLG_NF == "DoNotKnow" ~ NA_real_,
+    CP2_SS_BLG_NF != "yes_nuclear_family" & !is.na(CP2_SS_BLG_NF) & CP2_SS_BLG_NF != "DoNotKnow" & CP2_SS_BLG_NF != "PreferNotAnswer" ~ 1,  # do not belong to the nuclear family (and not NA)
     TRUE ~ NA_real_
   ))
 
