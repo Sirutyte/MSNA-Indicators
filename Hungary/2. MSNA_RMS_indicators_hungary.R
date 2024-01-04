@@ -713,6 +713,19 @@ result_nationality <- df_hh %>% filter(!is.na(nationality)) %>%
 print(result_nationality)
 
 # ------------------------------------------------------------------------------
+#  TEMPORARY PROTECTION
+# ------------------------------------------------------------------------------
+#% of HHs who have registered for temporary protection or similar scheme
+
+df_hh <- df_hh %>% mutate(ind_temp_prot = case_when(PRT02_SS_TEMP_PROT == "yes_applied_initial" ~ 1,
+                                                    PRT02_SS_TEMP_PROT == "yes_applied_extension" ~ 1,
+                                                    PRT02_SS_TEMP_PROT == "no_but_not_planning" ~ 0,
+                                                    PRT02_SS_TEMP_PROT == "no_but_planning" ~ 0,
+                                                    .default = NA)) 
+
+round(prop.table(table(df_hh$ind_temp_prot)), 2)
+
+# ------------------------------------------------------------------------------
 #  RURAL vs URBAN
 # ------------------------------------------------------------------------------
 # Percentage of households living in rural areas vs urban areas
