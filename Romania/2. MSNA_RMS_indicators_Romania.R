@@ -1229,8 +1229,9 @@ view(df_hh)
 df_hh_export <- df_hh %>%
   select("_index", "DR7.2_SS_RESP_GEN", "DR7.3_NUM_RESP_AGE" , "resp_age_cat",'impact3_3_safety_walking',"outcome4_1_GBV","outcome13_1_bank_account","outcome13_2_income","outcome16_2_social_protection", "outcome9_1_housing","crowding") 
 
-write.xlsx(df_hh_export, "RMS/household_level_indicators_romania.xlsx", sheetName = "Sheet1", colNames = TRUE, col_labels= TRUE)
 
+# Write the data frame to an Excel file
+write.xlsx(df_hh_export, "RMS/household_level_indicators_romania.xlsx", sheet = "Sheet1", col.names = TRUE)
 
 df_ind_export <- df_ind %>%
   select("_parent_index", "_index", "DR.12_SS_GEN","DR.11_NUM_AGE","age_cat", "DR.13_SS_REL","impact2_3_health","impact3_2a_primary_edu_enrol_rate","impact3_2b_secondary_edu_enrol_rate",
@@ -1238,7 +1239,7 @@ df_ind_export <- df_ind %>%
 
 
 
-write.xlsx(df_ind_export, "RMS/individual_level_indicators_romania.xlsx", sheetName = "Sheet1", colNames = TRUE, col_labels= TRUE)
+write.xlsx(df_ind_export, "RMS/individual_level_indicators_romania.xlsx", sheet = "Sheet1", col.names = TRUE)
 
 
 # import the MSNA VAM dataset, select only the final indicators and merge to the above data
@@ -1361,9 +1362,9 @@ view(df_hh_full)
 # ------------------------------------------------------------------------------
 # FINAL EXPORT
 # ------------------------------------------------------------------------------
-
-write.xlsx(df_hh_full, "Combined/household_combined_indicators_romania.xlsx", sheetName = "Sheet1", colNames = TRUE, col_labels= TRUE)
-
-
-write.xlsx(df_ind_full, "Combined/individual_combined_indicators_romania.xlsx", sheetName = "Sheet1", colNames = TRUE, col_labels= TRUE)
-
+ 
+ # Write the household data frame to an Excel file
+ write.xlsx(df_hh_full, "Combined/household_combined_indicators_romania.xlsx", sheet = "Sheet1", col.names = TRUE)
+ 
+ # Write the individual data frame to an Excel file
+ write.xlsx(df_ind_full, "Combined/individual_combined_indicators_romania.xlsx", sheet = "Sheet1", col.names = TRUE)
