@@ -1228,16 +1228,15 @@ df_ind %>% group_by(age_cat, female) %>%  count() %>%  ungroup() %>% mutate(per 
 
 
 df_hh_export <- df_hh %>%
-  select("_index", "DR7.2_SS_RESP_GEN", "DR7.3_NUM_RESP_AGE" , "resp_age_cat",'impact3_3_safety_walking',"outcome4_1_GBV","outcome13_1_bank_account","outcome13_2_income","outcome16_2_social_protection","crowding") 
+  select("_index", "DR7.2_SS_RESP_GEN", "DR7.3_NUM_RESP_AGE", "resp_age_cat", 'impact3_3_safety_walking', "outcome4_1_GBV", "outcome13_1_bank_account", "outcome13_2_income", "outcome16_2_social_protection", "crowding")
 
-write.xlsx(df_hh_export, "RMS/household_level_indicators_slovakia.xlsx", sheetName = "Sheet1", colNames = TRUE, col_labels= TRUE)
-
+write.xlsx(df_hh_export, "RMS/household_level_indicators_slovakia.xlsx", sheetName = "Sheet1")
 
 df_ind_export <- df_ind %>%
   select("_parent_index", "_index", "DR.12_SS_GEN","DR.11_NUM_AGE","age_cat", "DR.13_SS_REL","impact2_3_health","impact3_2a_primary_edu_enrol_rate","impact3_2b_secondary_edu_enrol_rate",
          "outcome1_2_children_registered","outcome1_3_legal_documents","outcome13_3_unemployment", "outcome10_1_polio","outcome10_1_measles")
 
-write.xlsx(df_ind_export, "RMS/individual_level_indicators_slovakia.xlsx", sheetName = "Sheet1", colNames = TRUE, col_labels= TRUE)
+write.xlsx(df_ind_export, "RMS/individual_level_indicators_slovakia.xlsx", sheetName = "Sheet1")
 
 
 # import the MSNA VAM dataset, select only the final indicators and merge to the above data
