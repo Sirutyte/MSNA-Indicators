@@ -29,10 +29,12 @@ sheet_names # print sheet names
 
 # Read Sheet 1
 df_hh <- read_excel("Data/xml-dataset-multi-sectoral-needs-assessment-poland-2023_23.11.2023.xlsx", sheet = "HH")
+df_hh <- read_excel("C:/Users/VONBORST/OneDrive - UNHCR/MSNA Datasets/Poland/Latest clean dataset/xml-dataset-multi-sectoral-needs-assessment-poland-2023_23.11.2023.xlsx", sheet = "HH")
 # View(df_hh)
 
 # Read Sheet 2
 df_ind <- read_excel("Data/xml-dataset-multi-sectoral-needs-assessment-poland-2023_23.11.2023.xlsx", sheet = "people")
+df_ind <- read_excel("C:/Users/VONBORST/OneDrive - UNHCR/MSNA Datasets/Poland/Latest clean dataset/xml-dataset-multi-sectoral-needs-assessment-poland-2023_23.11.2023.xlsx", sheet = "people")
 # View(df_ind)
 
 
@@ -155,6 +157,11 @@ var_label(df_hh$FCSCat28) <- "FCS Categories"
 
 round(prop.table(table(df_hh$FCSCat28)), 2)
 
+df_hh %>% group_by(FCSCat28) %>% filter(!is.na(FCSCat28)) %>% 
+  summarise(n = sum(Weight)) %>%
+  mutate(pct = n / sum(n),
+         pctlabel = paste0(round(pct*100), "%"))
+
 # -----------------------------------------------------------------------------
 # LIVELIHOOD COPING STRATEGIES INDEX
 # -----------------------------------------------------------------------------
@@ -247,6 +254,11 @@ val_lab(df_hh$Max_coping_behaviourEN) = num_lab("
 
 round(prop.table(table(df_hh$Max_coping_behaviourEN)), 2)
 
+df_hh %>% group_by(Max_coping_behaviourEN) %>% filter(!is.na(Max_coping_behaviourEN)) %>% 
+  summarise(n = sum(Weight)) %>%
+  mutate(pct = n / sum(n),
+         pctlabel = paste0(round(pct*100), "%"))
+
 # -----------------------------------------------------------------------------
 # REDUCED COPING STRATEGIES INDEX
 # -----------------------------------------------------------------------------
@@ -286,6 +298,12 @@ var_label(df_hh$rCSI) <- "Reduced coping strategies index (rCSI)"
 rCSI_table_mean <- df_hh %>% 
   drop_na(rCSI) %>% 
   summarise(meanrCSI = mean(rCSI))
+
+#Weighted
+rCSI_table_mean <- df_hh %>% 
+  drop_na(rCSI) %>% 
+  summarise(meanrCSI =  weighted.mean(rCSI,Weight))
+
 
 
 # ------------------------------------------------------------------------------
@@ -370,7 +388,7 @@ df_hh$total_expenditure[na_in_se_columns] <- NA
 # 1. SHARE OF EXPENDITURE ON FOOD
 df_hh$share_food_expenditure <- round(df_hh$SE.2.1_NUM_FOOD / df_hh$total_expenditure,2)
 
-df_hh %>% summarise(average = mean(share_food_expenditure, na.rm = T))
+df_hh %>% summarise(average = weighted.mean(share_food_expenditure,Weight, na.rm = T))
 
 # 2. SHARE OF EXPENDITURE ON ACCOMMODATION
 df_hh$share_accomm_expenditure <- round(df_hh$SE.2.2_NUM_ACCOM / df_hh$total_expenditure,2)

@@ -566,6 +566,11 @@ df_hh <- df_hh %>%
 
 round(prop.table(table(df_hh$sufficient_dwel_1)), 2)
 
+df_hh %>% group_by(sufficient_dwel_1) %>% filter(!is.na(sufficient_dwel_1)) %>% 
+  summarise(n = sum(Weight)) %>%
+  mutate(pct = n / sum(n),
+         pctlabel = paste0(round(pct*100), "%"))
+
 ## classify as habitable when adequate shelter
 
 df_hh <- df_hh %>%
@@ -732,6 +737,8 @@ cat("Minimum value:", min_value, "\n")
 cat("Maximum value:", max_value, "\n")
 
 df_hh %>% filter(!is.na(DR8_NUM_HH_SIZE)) %>% summarise(mean = mean(DR8_NUM_HH_SIZE))
+
+df_hh %>% filter(!is.na(DR8_NUM_HH_SIZE)) %>% summarise(mean = weighted.mean(DR8_NUM_HH_SIZE,Weight))
 
 # ------------------------------------------------------------------------------
 # % of children reported to attend early childhood education and care services in host country -- POLAND DOESN'T HAVE THIS QUESTION
@@ -1116,6 +1123,11 @@ result_accommodation_type <- data.frame(
 
 # Print or display the result
 print(result_accommodation_type )
+
+df_hh_filtered %>% group_by(SHL01_SS_ACCOM_TYP) %>% filter(!is.na(SHL01_SS_ACCOM_TYP)) %>% 
+  summarise(n = sum(Weight)) %>%
+  mutate(pct = n / sum(n),
+         pctlabel = paste0(round(pct*100), "%"))
 
 # ------------------------------------------------------------------------------
 # % HHs with of youth (age 15-24 years) not in education, employment or training
