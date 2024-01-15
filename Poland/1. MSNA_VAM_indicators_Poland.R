@@ -37,7 +37,11 @@ df_ind <- read_excel("Data/xml-dataset-multi-sectoral-needs-assessment-poland-20
 df_ind <- read_excel("C:/Users/VONBORST/OneDrive - UNHCR/MSNA Datasets/Poland/Latest clean dataset/xml-dataset-multi-sectoral-needs-assessment-poland-2023_23.11.2023.xlsx", sheet = "people")
 # View(df_ind)
 
+#Add weight column to individual dataset
 
+weight_column <- df_hh %>% select(Weight, `_index`)
+
+df_ind <- left_join(df_ind, weight_column, by = c("_parent_index" = "_index"))
 
 # ------------------------------------------------------------------------------
 # DISABILITY
@@ -95,6 +99,11 @@ table(df_ind$disability)
 
 round(prop.table(table(df_ind$disability)), 2)
 
+df_ind %>% group_by(disability) %>% filter(!is.na(disability)) %>% 
+  summarise(n = sum(Weight)) %>%
+  mutate(pct = n / sum(n),
+         pctlabel = paste0(round(pct*100), "%"))
+
 
 # -----------------------------------------------------------------------------
 # FOOD CONSUMPTION SCORE
@@ -142,6 +151,11 @@ val_lab(df_hh$FCSCat21) = num_lab("
 ")
 var_label(df_hh$FCSCat21) <- "FCS Categories"
 
+df_hh %>% group_by(FCSCat21) %>% filter(!is.na(FCSCat21)) %>% 
+  summarise(n = sum(Weight)) %>%
+  mutate(pct = n / sum(n),
+         pctlabel = paste0(round(pct*100), "%"))
+
 # Important note: pay attention to the threshold used by your CO when selecting the syntax (21 cat. vs 28 cat.)
 # Use this when analyzing a country with high consumption of sugar and oil – thresholds 28-42
 
@@ -155,7 +169,7 @@ val_lab(df_hh$FCSCat28) = num_lab("
 ")
 var_label(df_hh$FCSCat28) <- "FCS Categories"
 
-round(prop.table(table(df_hh$FCSCat28)), 2)
+round(prop.table(table(df_hh$FCSCat28)), 3)
 
 df_hh %>% group_by(FCSCat28) %>% filter(!is.na(FCSCat28)) %>% 
   summarise(n = sum(Weight)) %>%

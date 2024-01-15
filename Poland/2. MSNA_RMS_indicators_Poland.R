@@ -37,6 +37,12 @@ df_ind <- read_excel("Data/xml-dataset-multi-sectoral-needs-assessment-poland-20
 
 colnames(df_ind) <- gsub("/", "_", colnames(df_ind))# Replace "/" with "_" in columns
 
+#Add weight column to individual dataset
+
+weight_column <- df_hh %>% select(Weight, `_index`)
+
+df_ind <- left_join(df_ind, weight_column, by = c("_parent_index" = "_index"))
+
 
 # ------------------------------------------------------------------------------
 # # 2.3 Core impact indicator
@@ -105,6 +111,11 @@ table(df_ind$impact2_3_health)
 
 round(prop.table(table(df_ind$impact2_3_health)), 3)
 
+df_ind %>% group_by(impact2_3_health) %>% filter(!is.na(impact2_3_health)) %>% 
+  summarise(n = sum(Weight)) %>%
+  mutate(pct = n / sum(n),
+         pctlabel = paste0(round(pct*100), "%"))
+
 
 write_xlsx(df_ind, "RMS/final_individual_indicators.xlsx", col_names=TRUE)
 
@@ -147,7 +158,14 @@ df_ind <- df_ind %>%
                                label = "Proportion of persons of concern enrolled in primary education"))
 
 
+#Unweighted
 table(df_ind$impact3_2a_primary_edu_enrol_rate)
+
+#Weighted
+df_ind %>% group_by(edu_primary) %>% filter(!is.na(edu_primary)) %>% filter(DR.11_NUM_AGE > 5 & DR.11_NUM_AGE < 11) %>% 
+  summarise(n = sum(Weight)) %>%
+  mutate(pct = n / sum(n),
+         pctlabel = paste0(round(pct*100), "%"))
 
 
 write_xlsx(df_ind, "RMS/final_individual_indicators.xlsx", col_names = TRUE)
@@ -200,6 +218,11 @@ df_ind <- df_ind %>%
 
 table(df_ind$impact3_2b_secondary_edu_enrol_rate)
 
+df_ind %>% group_by(edu_primary) %>% filter(!is.na(edu_primary)) %>% filter(DR.11_NUM_AGE > 10 & DR.11_NUM_AGE < 16) %>% 
+  summarise(n = sum(Weight)) %>%
+  mutate(pct = n / sum(n),
+         pctlabel = paste0(round(pct*100), "%"))
+
 write_xlsx(df_ind, "RMS/final_individual_indicators.xlsx", col_names=TRUE)
 
 
@@ -226,6 +249,11 @@ df_hh <- df_hh %>%
 table(df_hh$impact3_3_safety_walking)
 
 round(prop.table(table(df_hh$impact3_3_safety_walking)), 2)
+
+df_hh %>% group_by(impact3_3_safety_walking) %>% filter(!is.na(impact3_3_safety_walking)) %>%  
+  summarise(n = sum(Weight)) %>%
+  mutate(pct = n / sum(n),
+         pctlabel = paste0(round(pct*100), "%"))
 
 
 write_xlsx(df_hh, "RMS/final_household_indicators.xlsx", col_names=TRUE)
@@ -332,8 +360,14 @@ df_ind <- df_ind %>%
 
 table(df_ind$outcome1_3_legal_documents)
 
+#Unweighted
 round(prop.table(table(df_ind$outcome1_3_legal_documents)), 3)
 
+#Weighted
+df_ind %>% group_by(outcome1_3_legal_documents) %>% filter(!is.na(outcome1_3_legal_documents)) %>%  
+  summarise(n = sum(Weight)) %>%
+  mutate(pct = n / sum(n),
+         pctlabel = paste0(round(pct*100), "%"))
 
 write_xlsx(df_ind, "RMS/final_individual_indicators.xlsx", col_names=TRUE)
 
@@ -400,7 +434,14 @@ df_hh <- df_hh %>%
 
 table(df_hh$outcome13_1_bank_account)
 
+#Unweighted
 round(prop.table(table(df_hh$outcome13_1_bank_account)), 2)
+
+#Weighted
+df_hh %>% group_by(outcome13_1_bank_account) %>% filter(!is.na(outcome13_1_bank_account)) %>%  
+  summarise(n = sum(Weight)) %>%
+  mutate(pct = n / sum(n),
+         pctlabel = paste0(round(pct*100), "%"))
 
 write_xlsx(df_hh, "RMS/final_household_indicators.xlsx", col_names=TRUE)
 
@@ -430,6 +471,12 @@ df_hh <- df_hh %>%
 table(df_hh$outcome13_2_income)
 
 round(prop.table(table(df_hh$outcome13_2_income)), 2)
+
+#Weighted
+df_hh %>% group_by(outcome13_2_income) %>% filter(!is.na(outcome13_2_income)) %>%  
+  summarise(n = sum(Weight)) %>%
+  mutate(pct = n / sum(n),
+         pctlabel = paste0(round(pct*100), "%"))
 
 
 write_xlsx(df_hh, "RMS/final_household_indicators.xlsx", col_names=TRUE)
@@ -474,7 +521,14 @@ df_ind <- df_ind %>%
     TRUE ~ 0
   ))
 
+#Unweighted
 round(prop.table(table(df_ind$labour_force)), 2)
+
+#Weighted
+df_ind %>% group_by(labour_force) %>% filter(!is.na(labour_force)) %>%  
+  summarise(n = sum(Weight)) %>%
+  mutate(pct = n / sum(n),
+         pctlabel = paste0(round(pct*100), "%"))
 
 unemployed_sum <- sum(df_ind$unemployed, na.rm = TRUE)
 labour_force_total <- sum(df_ind$labour_force, na.rm = TRUE)
@@ -484,6 +538,11 @@ df_ind <- df_ind %>%
 
 mean_outcome13_3_unemployment <- mean(df_ind$outcome13_3_unemployment, na.rm = TRUE)
 print(mean_outcome13_3_unemployment)
+
+df_ind %>% filter(labour_force == 1) %>% group_by(unemployed) %>%   
+  summarise(n = sum(Weight)) %>%
+  mutate(pct = n / sum(n),
+         pctlabel = paste0(round(pct*100), "%"))
 
 write_xlsx(df_ind, "RMS/final_individual_indicators.xlsx", col_names=TRUE)
 
@@ -521,6 +580,12 @@ df_hh <- df_hh %>%
 table(df_hh$outcome16_2_social_protection)
 
 round(prop.table(table(df_hh$outcome16_2_social_protection)), 2)
+
+#Weighted
+df_hh %>% group_by(outcome16_2_social_protection) %>% filter(!is.na(outcome16_2_social_protection)) %>%  
+  summarise(n = sum(Weight)) %>%
+  mutate(pct = n / sum(n),
+         pctlabel = paste0(round(pct*100), "%"))
 
 
 write_xlsx(df_hh, "RMS/final_household_indicators.xlsx", col_names=TRUE)
@@ -612,6 +677,11 @@ table(df_hh$outcome9_1_housing)
 
 round(prop.table(table(df_hh$outcome9_1_housing)), 2)
 
+df_hh %>% group_by(outcome9_1_housing) %>% filter(!is.na(outcome9_1_housing)) %>% 
+  summarise(n = sum(Weight)) %>%
+  mutate(pct = n / sum(n),
+         pctlabel = paste0(round(pct*100), "%"))
+
 write_xlsx(df_hh, "RMS/final_household_indicators.xlsx", col_names = TRUE)
 
 
@@ -651,6 +721,11 @@ table(df_ind$outcome10_1_measles)
 
 round(prop.table(table(df_ind$outcome10_1_measles)), 2)
 
+df_ind %>% group_by(outcome10_1_measles) %>% filter(!is.na(outcome10_1_measles)) %>% 
+  summarise(n = sum(Weight)) %>%
+  mutate(pct = n / sum(n),
+         pctlabel = paste0(round(pct*100), "%"))
+
 
 ### SAME LOGIC FOR POLIO 
 
@@ -673,6 +748,11 @@ df_ind <- df_ind %>%
 table(df_ind$outcome10_1_polio)
 
 round(prop.table(table(df_ind$outcome10_1_polio)), 2)
+
+df_ind %>% group_by(outcome10_1_polio) %>% filter(!is.na(outcome10_1_polio)) %>% 
+  summarise(n = sum(Weight)) %>%
+  mutate(pct = n / sum(n),
+         pctlabel = paste0(round(pct*100), "%"))
 
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
@@ -699,6 +779,11 @@ result_nationality <- df_hh %>% filter(!is.na(nationality)) %>%
   mutate(Percentage = prop.table(Count) * 100)
 
 print(result_nationality)
+
+df_hh %>% group_by(nationality) %>% filter(!is.na(nationality)) %>% 
+  summarise(n = sum(Weight)) %>%
+  mutate(pct = n / sum(n),
+         pctlabel = paste0(round(pct*100), "%"))
 
 # ------------------------------------------------------------------------------
 #  RURAL vs URBAN  --- POLAND DOESN'T HAVE THIS QUESTION
@@ -793,6 +878,11 @@ unique_responses <- unique(df_ind$E6_SS_DIST_LER)
 
 
  round(prop.table(table(df_ind$distant_learning_grouped)), 2)
+ 
+ df_ind %>% group_by(distant_learning_grouped) %>% filter(!is.na(distant_learning_grouped)) %>% 
+   summarise(n = sum(Weight)) %>%
+   mutate(pct = n / sum(n),
+          pctlabel = paste0(round(pct*100), "%"))
 
  # ------------------------------------------------------------------------------
  # attending both distant learning and school in host country
@@ -808,6 +898,11 @@ unique_responses <- unique(df_ind$E6_SS_DIST_LER)
  table(df_ind$attending_both_education)
 
  round(prop.table(table(df_ind$attending_both_education)), 2)
+ 
+ df_ind %>% group_by(attending_both_education) %>% filter(!is.na(attending_both_education)) %>% 
+   summarise(n = sum(Weight)) %>%
+   mutate(pct = n / sum(n),
+          pctlabel = paste0(round(pct*100), "%"))
 
 write_xlsx(df_ind, "check_education.xlsx", col_names = TRUE)
 
@@ -844,6 +939,17 @@ df_hh_filtered_feedback %>%
   summarise(per = round(sum(answer == "1", na.rm = TRUE) / sum(!is.na(answer)), 3)) %>%
   arrange(desc(per))
 
+#Weighted
+df_hh_filtered_feedback %>%
+  select(starts_with("AAP.4_SM_PRF_FEEDBACK_"), Weight) %>%
+  pivot_longer(cols = starts_with("AAP.4_SM_PRF_FEEDBACK_"),
+               names_to = "variable",
+               values_to = "answer") %>%
+  group_by(variable, answer) %>% filter(answer == 0 | answer == 1) %>% 
+  summarise(n = sum(Weight)) %>%
+  group_by(variable) %>% mutate(per= prop.table(n) * 100) %>% 
+  arrange(desc(answer), desc(per))
+
 # ------------------------------------------------------------------------------
 # Top three most commonly reported priority needs, by % of HHs per type of priority need reported
 # ------------------------------------------------------------------------------
@@ -859,6 +965,17 @@ df_hh_filtered_needs %>%
   group_by(variable) %>%
   summarise(per = round(sum(answer == "1", na.rm = TRUE) / sum(!is.na(answer)), 3)) %>%
   arrange(desc(per))
+
+#Weighted
+df_hh_filtered_needs %>%
+  select(starts_with("AAP.5_SM_TOP_NEEDS_"), Weight) %>%
+  pivot_longer(cols = starts_with("AAP.5_SM_TOP_NEEDS_"),
+               names_to = "variable",
+               values_to = "answer") %>%
+  group_by(variable, answer) %>% filter(answer == 0 | answer == 1) %>% 
+  summarise(n = sum(Weight)) %>%
+  group_by(variable) %>% mutate(per= prop.table(n) * 100) %>% 
+  arrange(desc(answer), desc(per))
 
 
 # ------------------------------------------------------------------------------
@@ -907,8 +1024,8 @@ df_hh_filtered_needs %>%
 df_hh_filtered_difficulty_work <- filter(df_ind, SE12_SM_EMP_BARR_none  != 1 & SE12_SM_EMP_BARR_prefer_not_to_answer != 1)
 
 
-df_hh_filtered_difficulty_work %>%
-  select(starts_with("SE12_SM_EMP_BARR")) %>%
+df_ind %>%
+  select(starts_with("SE12_SM_EMP_BARR_")) %>%
   mutate(across(everything(), as.character)) %>%
   pivot_longer(cols = everything(),
                names_to = "variable",
@@ -917,6 +1034,17 @@ df_hh_filtered_difficulty_work %>%
   summarise(per = round(sum(answer == "1", na.rm = TRUE) / sum(!is.na(answer)), 3)) %>%
   arrange(desc(per))
 
+#Weighted
+df_hh_filtered_difficulty_work %>%
+  select(starts_with("SE12_SM_EMP_BARR_"), Weight) %>%
+  pivot_longer(cols = starts_with("SE12_SM_EMP_BARR_"),
+               names_to = "variable",
+               values_to = "answer") %>%
+  group_by(variable, answer) %>% filter(answer == 0 | answer == 1) %>%
+  summarise(n = sum(Weight)) %>%
+  group_by(variable) %>% mutate(per= prop.table(n) * 100) %>% 
+  arrange(desc(answer), desc(per))
+
 
 # ------------------------------------------------------------------------------
 # % of HH members employed formally (with contract) 
@@ -924,6 +1052,7 @@ df_hh_filtered_difficulty_work %>%
 
 # !!!!!!! CHECK IF OUT OF TOTAL HOUSEHOLDS OR THOSE EMPLOYED ??? 
 
+#df_ind$SE11_SS_CONTRACT -> all observations are NAs
 
 column_name <- 'SE11_SS_CONTRACT'
 
@@ -944,6 +1073,7 @@ work_contract <- data.frame(ResponseCategory = names(tabulated_data),
 # Print or display the result
 print(work_contract)
 
+
 # ------------------------------------------------------------------------------
 # Top 3 - Main areas of support required for socio-economic inclusion
 # ------------------------------------------------------------------------------
@@ -963,6 +1093,17 @@ df_hh_filtered_economic_inclusion %>%
    summarise(per = round(sum(answer == "1", na.rm = TRUE) / sum(!is.na(answer)), 3)) %>%
    arrange(desc(per))
 
+#Weighted
+df_hh_filtered_economic_inclusion %>%
+  select(starts_with("SE1_SM_SUP_SRV_"), Weight) %>%
+  pivot_longer(cols = starts_with("SE1_SM_SUP_SRV_"),
+               names_to = "variable",
+               values_to = "answer") %>%
+  group_by(variable, answer) %>% filter(answer == 0 | answer == 1) %>%
+  summarise(n = sum(Weight)) %>%
+  group_by(variable) %>% mutate(per= prop.table(n) * 100) %>% 
+  arrange(desc(answer), desc(per))
+
 
 # ------------------------------------------------------------------------------
 # Top 3 - % of HHs household members by self-reported barriers to accessing health care in the last 30 days
@@ -973,7 +1114,7 @@ df_hh_filtered_economic_inclusion %>%
 
 df_hh_filtered_health_barrier <- filter(df_ind, H4_SM_HLTH_ACC_BARRIER_pnta != 1)
 
-df_hh_filtered_health_barrier %>%
+df_ind %>%
   select(starts_with("H4_SM_HLTH_ACC_BARRIER")) %>%
   mutate(across(everything(), as.character)) %>%
   pivot_longer(cols = everything(),
@@ -982,6 +1123,17 @@ df_hh_filtered_health_barrier %>%
   group_by(variable) %>%
   summarise(per = round(sum(answer == "1", na.rm = TRUE) / sum(!is.na(answer)), 3)) %>%
   arrange(desc(per))
+
+#Weighted
+df_hh_filtered_health_barrier %>%
+  select(starts_with("H4_SM_HLTH_ACC_BARRIER_"), Weight) %>%
+  pivot_longer(cols = starts_with("H4_SM_HLTH_ACC_BARRIER_"),
+               names_to = "variable",
+               values_to = "answer") %>%
+  group_by(variable, answer) %>% filter(answer == 0 | answer == 1) %>%
+  summarise(n = sum(Weight)) %>%
+  group_by(variable) %>% mutate(per= prop.table(n) * 100) %>% 
+  arrange(desc(answer), desc(per))
 
 
 # ------------------------------------------------------------------------------
@@ -1017,6 +1169,12 @@ result_df <- data.frame(ResponseCategory = names(tabulated_data),
 
 # Print or display the result
 print(result_df)
+
+#Weighted
+df_education %>% group_by(education_level) %>% filter(!is.na(education_level)) %>% 
+  summarise(n = sum(Weight)) %>%
+  mutate(pct = n / sum(n),
+         pctlabel = paste0(round(pct*100), "%"))
 
 # ------------------------------------------------------------------------------
 # % of HHs with children, who do not belong to the nuclear family/families in the HH
@@ -1059,6 +1217,12 @@ result_children_no_family <- data.frame(
 # Print or display the result
 print(result_children_no_family)
 
+#Weighted
+df_ind_filtered %>% group_by(children_no_nuclear_family) %>% filter(!is.na(children_no_nuclear_family)) %>% 
+  summarise(n = sum(Weight)) %>%
+  mutate(pct = n / sum(n),
+         pctlabel = paste0(round(pct*100), "%"))
+
 # ------------------------------------------------------------------------------
 # % of HHs who would report inappropriate behaviour from an aid worker
 # ------------------------------------------------------------------------------
@@ -1089,6 +1253,13 @@ result_aid_worker_inappropriate_behavior <- data.frame(
 
 # Print or display the result
 print(result_aid_worker_inappropriate_behavior)
+
+#Weighted
+df_hh_filtered %>% group_by(PSEA3_SS_BHV_RPT) %>%
+  summarise(n = sum(Weight)) %>%
+  mutate(pct = n / sum(n),
+         pctlabel = paste0(round(pct*100), "%"))
+
 
 # ------------------------------------------------------------------------------
 # % % of HHs by accommodation arrangement 
@@ -1124,6 +1295,7 @@ result_accommodation_type <- data.frame(
 # Print or display the result
 print(result_accommodation_type )
 
+#Weighted
 df_hh_filtered %>% group_by(SHL01_SS_ACCOM_TYP) %>% filter(!is.na(SHL01_SS_ACCOM_TYP)) %>% 
   summarise(n = sum(Weight)) %>%
   mutate(pct = n / sum(n),
@@ -1160,9 +1332,15 @@ df_ind <- df_ind %>%
 df_selected <- df_ind %>%
   select(DR.11_NUM_AGE, employed,E1_SS_ATT_EDU, SE8_SS_ACTIVITY,inactive_youth)
 
-view(df_selected)
+#view(df_selected)
 
 round(prop.table(table(df_ind$inactive_youth)), 2)
+
+#Weighted
+df_ind %>% group_by(inactive_youth) %>% filter(!is.na(inactive_youth)) %>% 
+  summarise(n = sum(Weight)) %>%
+  mutate(pct = n / sum(n),
+         pctlabel = paste0(round(pct*100), "%"))
 
 # write_xlsx(df_ind, "check_inactive_youth.xlsx", col_names = TRUE)
 
@@ -1193,6 +1371,12 @@ result_paying_rent_no_stress <- data.frame(
 # Print or display the result
 print(result_paying_rent_no_stress)
 
+#Weighted
+df_hh_filtered %>% group_by(SHL04) %>% filter(!is.na(SHL04)) %>% 
+  summarise(n = sum(Weight)) %>%
+  mutate(pct = n / sum(n),
+         pctlabel = paste0(round(pct*100), "%"))
+
 # ------------------------------------------------------------------------------
 # % of HHs under pressure to leave
 # ------------------------------------------------------------------------------
@@ -1222,6 +1406,12 @@ result_pressure_to_leave <- data.frame(
 
 # Print or display the result
 print(result_pressure_to_leave)
+
+#Weighted
+df_hh_filtered %>% group_by(SHL06_SS_UND_PRESSURE) %>% filter(!is.na(SHL06_SS_UND_PRESSURE)) %>% 
+  summarise(n = sum(Weight)) %>%
+  mutate(pct = n / sum(n),
+         pctlabel = paste0(round(pct*100), "%"))
 
 
 ## -----------------------------------------------------------------------------
