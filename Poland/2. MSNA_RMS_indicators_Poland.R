@@ -1560,6 +1560,24 @@ pivot_table_summary_child <- pivot_table_summary_child %>%
 
 # print(pivot_table_summary_child)
 
+#Weighted
+
+HH_child <- df_ind %>% mutate(HH_with_children = case_when(DR.11_NUM_AGE < 18 ~ 1,
+                                                           .default = 0)) %>%
+  select("_parent_index", HH_with_children) %>% filter(HH_with_children == 1)
+
+HH_child <- unique(HH_child)
+
+df_hh <- left_join(df_hh, HH_child, by = c("_index" = "_parent_index"))
+
+df_hh$HH_with_children[is.na(df_hh$HH_with_children)] <- 0
+
+round(prop.table(table(df_hh$HH_with_children)), 2)
+
+df_hh %>% group_by(HH_with_children) %>% 
+  summarise(n = sum(Weight)) %>%
+  mutate(pct = n / sum(n),
+         pctlabel = paste0(round(pct*100), "%"))
 
 
 
