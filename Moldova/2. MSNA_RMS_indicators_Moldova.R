@@ -193,8 +193,6 @@ write_xlsx(df_ind, "RMS/final_individual_indicators.xlsx", col_names = TRUE)
 # Proportion of Persons of Concern enrolled in secondary education (NET ENROLLEMENT RATE) 
 # ------------------------------------------------------------------------------
 
-#NOT AVAILABLE FOR MOLDOVA
-
 # Education	Education
 # E1_SS_ATT_EDU	Is/was your child enrolled and attending formal education (school/kindergarten/nursery) in the Czech Republic in 2022/2023?
 # E2_SM_RES_NO_EDU	What are the reasons your child does not attend school/kindergarten/nursery in the Czech Republic?
@@ -856,6 +854,28 @@ view(df_ind)
 
 #Weighted
 df_ind_early %>% group_by(E5_SS_EARLY_EDU) %>% filter(!is.na(E5_SS_EARLY_EDU)) %>% 
+  summarise(n = sum(Weight)) %>%
+  mutate(pct = n / sum(n),
+         pctlabel = paste0(round(pct*100), "%"))
+
+# ------------------------------------------------------------------------------
+# % of school-aged children enroll in school in host country
+# ------------------------------------------------------------------------------
+
+df_ind <- df_ind %>%
+  mutate(edu_rate = case_when(
+    (E1_SS_ATT_EDU == "yes") & (DR.11_NUM_AGE > 5 & DR.11_NUM_AGE < 16) ~ 1,  # attending in person
+    E1_SS_ATT_EDU == "no" & (DR.11_NUM_AGE > 5 & DR.11_NUM_AGE < 16) ~ 0,     # not attending education at all
+    (E1_SS_ATT_EDU == "PreferNotAnswer") & (DR.11_NUM_AGE > 5 & DR.11_NUM_AGE < 16) ~ NA_real_,
+    TRUE ~ NA_real_)  # default case, added to handle other cases not covered above
+  ) %>%
+  mutate(age_school = case_when(
+    DR.11_NUM_AGE > 5 & DR.11_NUM_AGE < 16 ~ 1,
+    TRUE ~ NA_real_)
+  )
+
+
+df_ind %>% group_by(edu_rate) %>% filter(!is.na(edu_rate)) %>% filter(DR.11_NUM_AGE > 5 & DR.11_NUM_AGE < 16) %>% 
   summarise(n = sum(Weight)) %>%
   mutate(pct = n / sum(n),
          pctlabel = paste0(round(pct*100), "%"))
