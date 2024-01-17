@@ -57,14 +57,21 @@ df_ind <- left_join(df_ind, weight_column, by = c("_parent_index" = "_index"))
 # WG.1.5_SS_DIFF_DRESS
 # WG.1.6_SS_DIFF_COMM
 
+table(df_ind$WG.1.1_SS_DIFF_SEE)
+table(df_ind$WG.1.2_SS_DIFF_HEAR)
+table(df_ind$WG.1.3_SS_DIFF_WALK)
+table(df_ind$WG.1.4_SS_DIFF_REM)
+table(df_ind$WG.1.5_SS_DIFF_DRESS)
+table(df_ind$WG.1.6_SS_DIFF_COMM)
+
 df_ind <-  df_ind %>%
   mutate( # disability identifier variables according to Washington Group standards
-    disaux1_34 = WG.1.1_SS_DIFF_SEE %in% c("lot_difficulty","cannot_all"), # indicator variables for all 6 domains with value TRUE if A LOT OF DIFFICULTY or CANNOT DO AT ALL
-    disaux2_34 = WG.1.2_SS_DIFF_HEAR %in% c("lot_difficulty","cannot_all"),
-    disaux3_34 = WG.1.3_SS_DIFF_WALK %in% c("lot_difficulty","cannot_all"),
-    disaux4_34 = WG.1.4_SS_DIFF_REM %in% c("lot_difficulty","cannot_all"),
-    disaux5_34 = WG.1.5_SS_DIFF_DRESS %in% c("lot_difficulty","cannot_all"),
-    disaux6_34 = WG.1.6_SS_DIFF_COMM %in% c("lot_difficulty","cannot_all")
+    disaux1_34 = WG.1.1_SS_DIFF_SEE %in% c("lot_difficulty","lot_of_diff","cannot_all", "cannot_do"), # indicator variables for all 6 domains with value TRUE if A LOT OF DIFFICULTY or CANNOT DO AT ALL
+    disaux2_34 = WG.1.2_SS_DIFF_HEAR %in% c("lot_difficulty","lot_of_diff","cannot_all", "cannot_do"),
+    disaux3_34 = WG.1.3_SS_DIFF_WALK %in% c("lot_difficulty","lot_of_diff","cannot_all", "cannot_do"),
+    disaux4_34 = WG.1.4_SS_DIFF_REM %in% c("lot_difficulty","lot_of_diff","cannot_all", "cannot_do"),
+    disaux5_34 = WG.1.5_SS_DIFF_DRESS %in% c("lot_difficulty","lot_of_diff","cannot_all", "cannot_do"),
+    disaux6_34 = WG.1.6_SS_DIFF_COMM %in% c("lot_difficulty","lot_of_diff","cannot_all", "cannot_do")
   ) %>%
   mutate(
     disSum34 = rowSums(select(., disaux1_34, disaux2_34 , disaux3_34 , disaux4_34 , disaux5_34 , disaux6_34)) # count number of TRUE indicator variables over 6 domains
@@ -100,14 +107,14 @@ df_ind <- df_ind %>%
 
 table(df_ind$disability)
 
-round(prop.table(table(df_ind$disability)), 2)
+round(prop.table(table(df_ind$disability)), 3)
 
 #Weighted
 
 df_ind %>% group_by(disability) %>% filter(!is.na(disability)) %>% 
   summarise(n = sum(Weight)) %>%
   mutate(pct = n / sum(n),
-         pctlabel = paste0(round(pct*100), "%"))
+         pctlabel = paste0(round(pct*1000), "%"))
 
 # -----------------------------------------------------------------------------
 # FOOD CONSUMPTION SCORE
