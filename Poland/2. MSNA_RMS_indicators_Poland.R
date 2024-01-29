@@ -108,9 +108,10 @@ df_ind <- df_ind %>% # Those who needed and asked to access healthcare - remove 
 
 table(df_ind$impact2_3_health)
 
-
+# Unweighted
 round(prop.table(table(df_ind$impact2_3_health)), 3)
 
+#Weighted
 df_ind %>% group_by(impact2_3_health) %>% filter(!is.na(impact2_3_health)) %>% 
   summarise(n = sum(Weight)) %>%
   mutate(pct = n / sum(n),
@@ -218,6 +219,7 @@ df_ind <- df_ind %>%
 
 table(df_ind$impact3_2b_secondary_edu_enrol_rate)
 
+# Weighted
 df_ind %>% group_by(edu_primary) %>% filter(!is.na(edu_primary)) %>% filter(DR.11_NUM_AGE > 10 & DR.11_NUM_AGE < 16) %>% 
   summarise(n = sum(Weight)) %>%
   mutate(pct = n / sum(n),
@@ -248,8 +250,10 @@ df_hh <- df_hh %>%
 
 table(df_hh$impact3_3_safety_walking)
 
+# Unweighted
 round(prop.table(table(df_hh$impact3_3_safety_walking)), 2)
 
+# Weighted
 df_hh %>% group_by(impact3_3_safety_walking) %>% filter(!is.na(impact3_3_safety_walking)) %>%  
   summarise(n = sum(Weight)) %>%
   mutate(pct = n / sum(n),
@@ -470,6 +474,7 @@ df_hh <- df_hh %>%
 
 table(df_hh$outcome13_2_income)
 
+# Unweighted
 round(prop.table(table(df_hh$outcome13_2_income)), 2)
 
 #Weighted
@@ -530,6 +535,7 @@ df_ind %>% group_by(labour_force) %>% filter(!is.na(labour_force)) %>%
   mutate(pct = n / sum(n),
          pctlabel = paste0(round(pct*100), "%"))
 
+# Unweighted
 unemployed_sum <- sum(df_ind$unemployed, na.rm = TRUE)
 labour_force_total <- sum(df_ind$labour_force, na.rm = TRUE)
 
@@ -539,6 +545,7 @@ df_ind <- df_ind %>%
 mean_outcome13_3_unemployment <- mean(df_ind$outcome13_3_unemployment, na.rm = TRUE)
 print(mean_outcome13_3_unemployment)
 
+# Weighted
 df_ind %>% filter(labour_force == 1) %>% group_by(unemployed) %>%   
   summarise(n = sum(Weight)) %>%
   mutate(pct = n / sum(n),
@@ -629,8 +636,10 @@ df_hh <- df_hh %>%
            TRUE ~ 0)
   )
 
+# Unweighted
 round(prop.table(table(df_hh$sufficient_dwel_1)), 2)
 
+#Weighted
 df_hh %>% group_by(sufficient_dwel_1) %>% filter(!is.na(sufficient_dwel_1)) %>% 
   summarise(n = sum(Weight)) %>%
   mutate(pct = n / sum(n),
@@ -675,8 +684,10 @@ df_hh <- df_hh %>%
 
 table(df_hh$outcome9_1_housing)
 
+# Unweighted
 round(prop.table(table(df_hh$outcome9_1_housing)), 2)
 
+# Weighted
 df_hh %>% group_by(outcome9_1_housing) %>% filter(!is.na(outcome9_1_housing)) %>% 
   summarise(n = sum(Weight)) %>%
   mutate(pct = n / sum(n),
@@ -719,8 +730,10 @@ df_ind <- df_ind %>%
 
 table(df_ind$outcome10_1_measles)
 
+# Unweighted
 round(prop.table(table(df_ind$outcome10_1_measles)), 2)
 
+# Weighted
 df_ind %>% group_by(outcome10_1_measles) %>% filter(!is.na(outcome10_1_measles)) %>% 
   summarise(n = sum(Weight)) %>%
   mutate(pct = n / sum(n),
@@ -747,8 +760,10 @@ df_ind <- df_ind %>%
 
 table(df_ind$outcome10_1_polio)
 
+# Unweighted
 round(prop.table(table(df_ind$outcome10_1_polio)), 2)
 
+# Weighted
 df_ind %>% group_by(outcome10_1_polio) %>% filter(!is.na(outcome10_1_polio)) %>% 
   summarise(n = sum(Weight)) %>%
   mutate(pct = n / sum(n),
@@ -772,7 +787,7 @@ df_hh <- df_hh %>%
     TRUE ~ NA_character_
   ))
 
-
+# Unweighted
 result_nationality <- df_hh %>% filter(!is.na(nationality)) %>% 
   group_by(nationality) %>%
   summarise(Count = n()) %>%
@@ -780,10 +795,11 @@ result_nationality <- df_hh %>% filter(!is.na(nationality)) %>%
 
 print(result_nationality)
 
+# Weighted
 df_hh %>% group_by(nationality) %>% filter(!is.na(nationality)) %>% 
   summarise(n = sum(Weight)) %>%
   mutate(pct = n / sum(n),
-         pctlabel = paste0(round(pct*100), "%"))
+         pctlabel = paste0(round(pct*1000), "%"))
 
 # ------------------------------------------------------------------------------
 #  RURAL vs URBAN  --- POLAND DOESN'T HAVE THIS QUESTION
@@ -856,6 +872,32 @@ df_hh %>% filter(!is.na(DR8_NUM_HH_SIZE)) %>% summarise(mean = weighted.mean(DR8
 # view(df_ind)
 
 # ------------------------------------------------------------------------------
+# % of school-aged children enroll in school in host country
+# ------------------------------------------------------------------------------
+
+
+df_ind <- df_ind %>%
+  mutate(edu_rate = case_when(
+    (E1_SS_ATT_EDU == "enrolledandattended") & (DR.11_NUM_AGE > 5 & DR.11_NUM_AGE < 16) ~ 1,  # attending school in person
+    (E1_SS_ATT_EDU == "enrolledanddropped") & (DR.11_NUM_AGE > 5 & DR.11_NUM_AGE < 16) ~ 0,  # dropped so not attending 
+    (E1_SS_ATT_EDU == "no") & (DR.11_NUM_AGE > 5 & DR.11_NUM_AGE < 16) ~ 0,                  # not attending school at all  
+    (E1_SS_ATT_EDU == "pnta") & (DR.11_NUM_AGE > 5 & DR.11_NUM_AGE < 16) ~ NA_real_,
+    TRUE ~ NA_real_)  # default case, added to handle other cases not covered above
+  ) %>%
+  mutate(age_rate = case_when(
+    DR.11_NUM_AGE > 5 & DR.11_NUM_AGE < 16 ~ 1,
+    TRUE ~ NA_real_) 
+  )
+
+
+#Weighted
+df_ind %>% group_by(edu_rate) %>% filter(!is.na(edu_rate)) %>% filter(DR.11_NUM_AGE > 5 & DR.11_NUM_AGE < 16) %>% 
+  summarise(n = sum(Weight)) %>%
+  mutate(pct = n / sum(n),
+         pctlabel = paste0(round(pct*100), "%"))
+
+
+# ------------------------------------------------------------------------------
 # % of school-aged children accessing Ukrainian distance learning
 # ------------------------------------------------------------------------------
 
@@ -877,8 +919,10 @@ unique_responses <- unique(df_ind$E6_SS_DIST_LER)
                                               label = "Accessing Ukrainian distant learning"))
 
 
+# Unweighted
  round(prop.table(table(df_ind$distant_learning_grouped)), 2)
  
+# Weighted 
  df_ind %>% group_by(distant_learning_grouped) %>% filter(!is.na(distant_learning_grouped)) %>% 
    summarise(n = sum(Weight)) %>%
    mutate(pct = n / sum(n),
@@ -897,8 +941,10 @@ unique_responses <- unique(df_ind$E6_SS_DIST_LER)
 
  table(df_ind$attending_both_education)
 
+ # Unweighted
  round(prop.table(table(df_ind$attending_both_education)), 2)
  
+ # Weighted
  df_ind %>% group_by(attending_both_education) %>% filter(!is.na(attending_both_education)) %>% 
    summarise(n = sum(Weight)) %>%
    mutate(pct = n / sum(n),
@@ -1021,7 +1067,7 @@ df_hh_filtered_needs %>%
 
 # SE12_SM_EMP_BARR
 
-df_hh_filtered_difficulty_work <- filter(df_ind, SE12_SM_EMP_BARR_none  != 1 & SE12_SM_EMP_BARR_prefer_not_to_answer != 1)
+df_hh_filtered_difficulty_work <- filter(df_ind, SE12_SM_EMP_BARR_none  != 1 & SE12_SM_EMP_BARR_prefer_not_to_answer != 1, SE12_SM_EMP_BARR_not_looking_for_work != 1)
 
 
 df_ind %>%
@@ -1054,24 +1100,24 @@ df_hh_filtered_difficulty_work %>%
 
 #df_ind$SE11_SS_CONTRACT -> all observations are NAs
 
-column_name <- 'SE11_SS_CONTRACT'
-
-# Exclude "PreferNotAnswer" or "dont_know" responses
-df_ind_contract <- df_ind[!(df_ind[[column_name]] %in% c("prefer_not_to_answer", "dont_know")), ]
-
-# Use table() to tabulate response options
-tabulated_data <- table(df_ind_contract[[column_name]])
-
-# Calculate the percentage of total for each category
-percentage_data <- prop.table(tabulated_data) * 100
-
-# Combine the tabulated data and percentage data into a data frame
-work_contract <- data.frame(ResponseCategory = names(tabulated_data),
-                            Count = as.numeric(tabulated_data),
-                            Percentage = as.numeric(percentage_data))
-
-# Print or display the result
-print(work_contract)
+# column_name <- 'SE11_SS_CONTRACT'
+# 
+# # Exclude "PreferNotAnswer" or "dont_know" responses
+# df_ind_contract <- df_ind[!(df_ind[[column_name]] %in% c("prefer_not_to_answer", "dont_know")), ]
+# 
+# # Use table() to tabulate response options
+# tabulated_data <- table(df_ind_contract[[column_name]])
+# 
+# # Calculate the percentage of total for each category
+# percentage_data <- prop.table(tabulated_data) * 100
+# 
+# # Combine the tabulated data and percentage data into a data frame
+# work_contract <- data.frame(ResponseCategory = names(tabulated_data),
+#                             Count = as.numeric(tabulated_data),
+#                             Percentage = as.numeric(percentage_data))
+# 
+# # Print or display the result
+# print(work_contract)
 
 
 # ------------------------------------------------------------------------------
@@ -1083,6 +1129,7 @@ print(work_contract)
 
 df_hh_filtered_economic_inclusion <- filter(df_hh, SE1_SM_SUP_SRV_none != 1 & SE1_SM_SUP_SRV_prefer_not_to_answer != 1 & SE1_SM_SUP_SRV_dont_know!= 1)
 
+# Unweighted
 df_hh_filtered_economic_inclusion %>%
    select(starts_with("SE1_SM_SUP_SRV")) %>%
    mutate(across(everything(), as.character)) %>%
@@ -1114,6 +1161,7 @@ df_hh_filtered_economic_inclusion %>%
 
 df_hh_filtered_health_barrier <- filter(df_ind, H4_SM_HLTH_ACC_BARRIER_pnta != 1)
 
+# Unweighted
 df_ind %>%
   select(starts_with("H4_SM_HLTH_ACC_BARRIER")) %>%
   mutate(across(everything(), as.character)) %>%
@@ -1560,6 +1608,24 @@ pivot_table_summary_child <- pivot_table_summary_child %>%
 
 # print(pivot_table_summary_child)
 
+#Weighted
+
+HH_child <- df_ind %>% mutate(HH_with_children = case_when(DR.11_NUM_AGE < 18 ~ 1,
+                                                           .default = 0)) %>%
+  select("_parent_index", HH_with_children) %>% filter(HH_with_children == 1)
+
+HH_child <- unique(HH_child)
+
+df_hh <- left_join(df_hh, HH_child, by = c("_index" = "_parent_index"))
+
+df_hh$HH_with_children[is.na(df_hh$HH_with_children)] <- 0
+
+round(prop.table(table(df_hh$HH_with_children)), 2)
+
+df_hh %>% group_by(HH_with_children) %>% 
+  summarise(n = sum(Weight)) %>%
+  mutate(pct = n / sum(n),
+         pctlabel = paste0(round(pct*100), "%"))
 
 
 
