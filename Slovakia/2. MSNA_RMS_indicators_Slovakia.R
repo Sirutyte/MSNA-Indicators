@@ -1085,6 +1085,7 @@ result_accommodation_type <- data.frame(
 # Print or display the result
 print(result_accommodation_type )
 
+
 # ------------------------------------------------------------------------------
 # % HHs with of youth (age 15-24 years) not in education, employment or training
 # ------------------------------------------------------------------------------
@@ -1228,13 +1229,14 @@ df_ind %>% group_by(age_cat, female) %>%  count() %>%  ungroup() %>% mutate(per 
 
 
 df_hh_export <- df_hh %>%
-  select("_index", "DR7.2_SS_RESP_GEN", "DR7.3_NUM_RESP_AGE", "resp_age_cat", 'impact3_3_safety_walking', "outcome4_1_GBV", "outcome13_1_bank_account", "outcome13_2_income", "outcome16_2_social_protection", "crowding")
+  select("_index", "DR7.2_SS_RESP_GEN", "DR7.3_NUM_RESP_AGE", "resp_age_cat", 'impact3_3_safety_walking', "outcome4_1_GBV", "outcome13_1_bank_account", "outcome13_2_income", "outcome16_2_social_protection", "crowding", "outcome9_1_housing","ind_temp_prot")
 
 write.xlsx(df_hh_export, "RMS/household_level_indicators_slovakia.xlsx", sheetName = "Sheet1")
 
 df_ind_export <- df_ind %>%
   select("_parent_index", "_index", "DR.12_SS_GEN","DR.11_NUM_AGE","age_cat", "DR.13_SS_REL","impact2_3_health","impact3_2a_primary_edu_enrol_rate","impact3_2b_secondary_edu_enrol_rate",
-         "outcome1_2_children_registered","outcome1_3_legal_documents","outcome13_3_unemployment", "outcome10_1_polio","outcome10_1_measles")
+         "outcome1_2_children_registered","outcome1_3_legal_documents","outcome13_3_unemployment", "outcome10_1_polio","outcome10_1_measles", "distant_learning_grouped",
+         "attending_both_education","inactive_youth","children_no_nuclear_family","education_level")
 
 write.xlsx(df_ind_export, "RMS/individual_level_indicators_slovakia.xlsx", sheetName = "Sheet1")
 
@@ -1326,8 +1328,6 @@ pivot_table_summary_child <- pivot_table_summary_child %>%
 # print(pivot_table_summary_child)
 
 
-
-
 # df_ind_full <- left_join(df_ind_full, pivot_table_summary,
 #                         by = c("parent_index" = "parent_index"))
 
@@ -1363,8 +1363,8 @@ df_ind_full <- df_ind_full %>%
 # FINAL EXPORT
 # ------------------------------------------------------------------------------
 
-write.xlsx(df_hh_full, "Combined/household_combined_indicators_slovakia.xlsx", sheetName = "Sheet1", colNames = TRUE, col_labels= TRUE)
+write.xlsx(df_hh_full, "Combined/household_combined_indicators_slovakia.xlsx", sheetName = "Sheet1")
 
 
-write.xlsx(df_ind_full, "Combined/individual_combined_indicators_slovakia.xlsx", sheetName = "Sheet1", colNames = TRUE, col_labels= TRUE)
+write.xlsx(df_ind_full, "Combined/individual_combined_indicators_slovakia.xlsx", sheetName = "Sheet1")
 
