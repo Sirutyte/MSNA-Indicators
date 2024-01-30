@@ -1239,7 +1239,7 @@ write.xlsx(df_hh_export, "RMS/household_level_indicators_bulgaria.xlsx", sheetNa
 
 df_ind_export <- df_ind %>%
   select("_parent_index", "_index", "DR.12_SS_GEN","DR.11_NUM_AGE","age_cat", "DR.13_SS_REL","impact2_3_health","impact3_2a_primary_edu_enrol_rate","impact3_2b_secondary_edu_enrol_rate",
-         "outcome1_2_children_registered","outcome1_3_legal_documents","outcome13_3_unemployment", "outcome10_1_polio","outcome10_1_measles")
+         "outcome1_2_children_registered","outcome1_3_legal_documents","outcome13_3_unemployment","outcome10_1_measles")
 
 write.xlsx(df_ind_export, "RMS/individual_level_indicators_bulgaria.xlsx", sheetName = "Sheet1", colNames = TRUE, col_labels= TRUE)
 

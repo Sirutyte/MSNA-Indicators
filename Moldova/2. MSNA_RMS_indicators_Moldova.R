@@ -1,4 +1,4 @@
- 
+
 ## Clear environment, if needed
 
 rm(list = ls())
@@ -24,18 +24,38 @@ library(writexl)
 library(expss)
 
 
-sheet_names = excel_sheets("Data/Renamed for RB final trimmed v2.3.xlsx") # get sheet names
-sheet_names # print sheet names
+
+#sheet_names = excel_sheets("Data/Renamed for RB final trimmed v2.3.xlsx") # get sheet names
+#sheet_names # print sheet names
 
 # Read Sheet 1
-df_hh <- read_excel("C:/Users/VONBORST/OneDrive - UNHCR/MSNA Datasets/Moldova/Latest clean dataset/Renamed for RB final trimmed v2.3.xlsx", 
-                    sheet = "HH level ren", skip = 1)
+#df_hh <- read_excel("C:/Users/VONBORST/OneDrive - UNHCR/MSNA Datasets/Moldova/Latest clean dataset/Renamed for RB final trimmed v2.3.xlsx", 
+#                    sheet = "HH level ren", skip = 1)
 # View(df_hh)
 
 # Read Sheet 2
-df_ind <- read_excel("C:/Users/VONBORST/OneDrive - UNHCR/MSNA Datasets/Moldova/Latest clean dataset/Renamed for RB final trimmed v2.3.xlsx", 
-                     sheet = "HH ind ren", skip = 1)
+#df_ind <- read_excel("C:/Users/VONBORST/OneDrive - UNHCR/MSNA Datasets/Moldova/Latest clean dataset/Renamed for RB final trimmed v2.3.xlsx", 
+#                     sheet = "HH ind ren", skip = 1)
 # View(df_ind)
+
+
+sheet_names = excel_sheets("Data/Renamed for RB final full v2.3.xlsx") # get sheet names
+sheet_names # print sheet names
+
+
+# Read Sheet 1
+df_hh <- read_excel("Data/Renamed for RB final full v2.3.xlsx", sheet = "HH level ren", skip = 1)
+# View(df_hh)
+
+
+# Read Sheet 2
+df_ind <- read_excel("Data/Renamed for RB final full v2.3.xlsx",sheet = "HH ind ren", skip = 1)
+# View(df_ind)
+
+
+df_ind_regional <- read_excel("Data/MSNA Regional individual dataset_2023.01.05.xlsx")
+
+
 
 
 # ------------------------------------------------------------------------------
@@ -1234,13 +1254,13 @@ df_ind %>% filter(DR.12_SS_GEN != "no_answer") %>%  group_by(age_cat, DR.12_SS_G
 
 
 df_hh_export <- df_hh %>%
-  select("_index", "DR7.2_SS_RESP_GEN", "DR7.3_NUM_RESP_AGE" , "resp_age_cat",'impact3_3_safety_walking',"outcome4_1_GBV","outcome13_1_bank_account","outcome13_2_income","outcome16_2_social_protection","crowding") 
+  select("_index", "DR7.2_SS_RESP_GEN", "DR7.3_NUM_RESP_AGE" , "resp_age_cat","outcome4_1_GBV","outcome13_1_bank_account","outcome13_2_income","outcome16_2_social_protection") 
 
 write.xlsx(df_hh_export, "RMS/household_level_indicators_moldova.xlsx", sheetName = "Sheet1", colNames = TRUE, col_labels= TRUE)
 
 
 df_ind_export <- df_ind %>%
-  select("_parent_index", "_index", "DR.12_SS_GEN","DR.11_NUM_AGE","age_cat", "DR.13_SS_REL","impact2_3_health","impact3_2a_primary_edu_enrol_rate","impact3_2b_secondary_edu_enrol_rate",
+  select("_parent_index", "_index", "DR.12_SS_GEN","DR.11_NUM_AGE","age_cat", "DR.13_SS_REL","impact2_3_health",
          "outcome1_2_children_registered","outcome1_3_legal_documents","outcome13_3_unemployment", "outcome10_1_polio","outcome10_1_measles")
 
 write.xlsx(df_ind_export, "RMS/individual_level_indicators_moldova.xlsx", sheetName = "Sheet1", colNames = TRUE, col_labels= TRUE)
