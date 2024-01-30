@@ -424,7 +424,7 @@ df_hh$expenditure_quantiles <- cut(df_hh$total_expenditure, breaks = quantiles, 
 # EXPORT THE VARIABLES
 
 df_hh_export <- df_hh %>%
-  select("_index", "FCS","FCSCat21", "stress_coping_EN", "emergency_coping_EN", "crisis_coping_EN", "Max_coping_behaviourEN", "rCSI", "total_expenditure", "share_food_expenditure","share_accomm_expenditure", "share_health_expenditure","share_hygiene_expenditure","share_communication_expenditure","share_hh_bills_expenditure","share_education_expenditure","share_debt_expenditure","share_other_expenditure" ) 
+  select("_index", "FCS","FCSCat21", "stress_coping_EN", "emergency_coping_EN", "crisis_coping_EN", "Max_coping_behaviourEN", "rCSI", "total_expenditure", "expenditure_quantiles", "share_food_expenditure","share_accomm_expenditure", "share_health_expenditure","share_hygiene_expenditure","share_communication_expenditure","share_hh_bills_expenditure","share_education_expenditure","share_debt_expenditure","share_other_expenditure" ) 
 
 write.xlsx(df_hh_export, "VAM/hh_indicators_hungary.xlsx")
 
