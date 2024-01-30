@@ -411,6 +411,16 @@ df_hh$share_other_expenditure <- round(df_hh$SE.2.7_NUM_OTH / df_hh$total_expend
 
 # ------------------------------------------------------------------------------
 
+# Calculate quantiles with na.rm = TRUE
+quantiles <- quantile(df_hh$total_expenditure, probs = c(0, 0.2, 0.4, 0.6, 0.8, 1), na.rm = TRUE)
+
+# Assign categories based on quantiles
+df_hh$expenditure_quantiles <- cut(df_hh$total_expenditure, breaks = quantiles, labels = c("Very Low", "Low", "Medium", "High", "Very High"), include.lowest = TRUE)
+
+
+# ------------------------------------------------------------------------------
+
+
 # EXPORT THE VARIABLES
 
 df_hh_export <- df_hh %>%
