@@ -35,7 +35,6 @@ View(df_hh)
 # Read Sheet 2
 df_ind <- read_excel("Data/Multi-Sector_Needs_Assessment_2023_-_Romania_-_latest_version_-_False_-_2023-11-20-09-17-14.xlsx", sheet = "Info")
 
-
 # ------------------------------------------------------------------------------
 # # 2.3 Core impact indicator
 # Proportion of PoC with access to health services
@@ -1279,7 +1278,7 @@ df_ind_full <- df_ind_full %>%
 view(df_ind_full)
 pivot_table_summary <- df_ind_full %>%
   group_by(parent_index) %>%
-  summarise(sum_hh_disability = sum(disability)) 
+  summarise(sum_hh_disability = sum(disability))
 
 
 print(pivot_table_summary)
@@ -1325,26 +1324,6 @@ pivot_table_summary_child <- pivot_table_summary_child %>%
                               labels = c('HH without children', 
                                          'HH with children'),
                               levels = c(0, 1)))
-
-#other way to calculate
-
-sum(is.na(df_ind$DR.11_NUM_AGE))#check NAs
-
-HH_child <- df_ind %>% mutate(HH_with_children = case_when(DR.11_NUM_AGE < 18 ~ 1,
-                                                          .default = 0)) %>%
-  select("_parent_index", HH_with_children) %>% filter(HH_with_children == 1)
-
-sum(duplicated(HH_child))
-
-HH_child <- unique(HH_child)
-
-df_hh <- left_join(df_hh, HH_child, by = c("_index" = "_parent_index"))
-
-df_hh$HH_with_children[is.na(df_hh$HH_with_children)] <- 0
-
-table(df_hh$HH_with_children)
-
-round(prop.table(table(df_hh$HH_with_children)), 2)
 
 # print(pivot_table_summary_child)
 
