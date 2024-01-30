@@ -1,7 +1,7 @@
+
 ## Clear environment, if needed
 rm(list = ls())
-setwd("/Users/irmasirutyte/Desktop/MSNA Composite/MSNA_updated_czech")
-
+setwd("/Users/irmasirutyte/Desktop/MSNA Composite/MSNA_updated_moldova")
 
 ## Libraries
 
@@ -24,15 +24,26 @@ library(writexl)
 library(expss)
 
 
-sheet_names = excel_sheets("Data/2023_Czech_Republic_Multi-Sector_Needs_Assessment.xlsx") # get sheet names
+sheet_names = excel_sheets("Data/Renamed for RB final trimmed v2.3.xlsx") # get sheet names
 sheet_names # print sheet names
 
 # Read Sheet 1
-df_hh <- read_excel("Data/2023_Czech_Republic_Multi-Sector_Needs_Assessment.xlsx", sheet = "2023 Czech Republic Multi-Se...")
-View(df_hh)
+df_hh <- read_excel("C:/Users/VONBORST/OneDrive - UNHCR/MSNA Datasets/Moldova/Latest clean dataset/Renamed for RB final trimmed v2.3.xlsx", 
+                    sheet = "HH level ren", skip = 1)
+# View(df_hh)
 
 # Read Sheet 2
-df_ind <- read_excel("Data/2023_Czech_Republic_Multi-Sector_Needs_Assessment.xlsx", sheet = "Info")
+df_ind <- read_excel("C:/Users/VONBORST/OneDrive - UNHCR/MSNA Datasets/Moldova/Latest clean dataset/Renamed for RB final trimmed v2.3.xlsx", 
+                     sheet = "HH ind ren", skip = 1)
+# View(df_ind)
+
+#Add weight column to individual dataset
+
+df_hh <- rename(df_hh, Weight = weight)
+
+weight_column <- df_hh %>% select(Weight, `_index`)
+
+df_ind <- left_join(df_ind, weight_column, by = c("_parent_index" = "_index"))
 
 
 # ------------------------------------------------------------------------------
@@ -46,14 +57,21 @@ df_ind <- read_excel("Data/2023_Czech_Republic_Multi-Sector_Needs_Assessment.xls
 # WG.1.5_SS_DIFF_DRESS
 # WG.1.6_SS_DIFF_COMM
 
+table(df_ind$WG.1.1_SS_DIFF_SEE)
+table(df_ind$WG.1.2_SS_DIFF_HEAR)
+table(df_ind$WG.1.3_SS_DIFF_WALK)
+table(df_ind$WG.1.4_SS_DIFF_REM)
+table(df_ind$WG.1.5_SS_DIFF_DRESS)
+table(df_ind$WG.1.6_SS_DIFF_COMM)
+
 df_ind <-  df_ind %>%
   mutate( # disability identifier variables according to Washington Group standards
-    disaux1_34 = WG.1.1_SS_DIFF_SEE %in% c("lot_difficulty","cannot_all"), # indicator variables for all 6 domains with value TRUE if A LOT OF DIFFICULTY or CANNOT DO AT ALL
-    disaux2_34 = WG.1.2_SS_DIFF_HEAR %in% c("lot_difficulty","cannot_all"),
-    disaux3_34 = WG.1.3_SS_DIFF_WALK %in% c("lot_difficulty","cannot_all"),
-    disaux4_34 = WG.1.4_SS_DIFF_REM %in% c("lot_difficulty","cannot_all"),
-    disaux5_34 = WG.1.5_SS_DIFF_DRESS %in% c("lot_difficulty","cannot_all"),
-    disaux6_34 = WG.1.6_SS_DIFF_COMM %in% c("lot_difficulty","cannot_all")
+    disaux1_34 = WG.1.1_SS_DIFF_SEE %in% c("lot_difficulty","lot_of_diff","cannot_all", "cannot_do"), # indicator variables for all 6 domains with value TRUE if A LOT OF DIFFICULTY or CANNOT DO AT ALL
+    disaux2_34 = WG.1.2_SS_DIFF_HEAR %in% c("lot_difficulty","lot_of_diff","cannot_all", "cannot_do"),
+    disaux3_34 = WG.1.3_SS_DIFF_WALK %in% c("lot_difficulty","lot_of_diff","cannot_all", "cannot_do"),
+    disaux4_34 = WG.1.4_SS_DIFF_REM %in% c("lot_difficulty","lot_of_diff","cannot_all", "cannot_do"),
+    disaux5_34 = WG.1.5_SS_DIFF_DRESS %in% c("lot_difficulty","lot_of_diff","cannot_all", "cannot_do"),
+    disaux6_34 = WG.1.6_SS_DIFF_COMM %in% c("lot_difficulty","lot_of_diff","cannot_all", "cannot_do")
   ) %>%
   mutate(
     disSum34 = rowSums(select(., disaux1_34, disaux2_34 , disaux3_34 , disaux4_34 , disaux5_34 , disaux6_34)) # count number of TRUE indicator variables over 6 domains
@@ -86,10 +104,17 @@ df_ind <- df_ind %>%
                             "Without disability" = 0,
                             "With disability" = 1)
   ))
+
 table(df_ind$disability)
 
-round(prop.table(table(df_ind$disability)), 2)
+round(prop.table(table(df_ind$disability)), 3)
 
+#Weighted
+
+df_ind %>% group_by(disability) %>% filter(!is.na(disability)) %>% 
+  summarise(n = sum(Weight)) %>%
+  mutate(pct = n / sum(n),
+         pctlabel = paste0(round(pct*1000), "%"))
 
 # -----------------------------------------------------------------------------
 # FOOD CONSUMPTION SCORE
@@ -137,6 +162,12 @@ val_lab(df_hh$FCSCat21) = num_lab("
 ")
 var_label(df_hh$FCSCat21) <- "FCS Categories"
 
+#Weighted
+df_hh %>% group_by(FCSCat21) %>% filter(!is.na(FCSCat21)) %>% 
+  summarise(n = sum(Weight)) %>%
+  mutate(pct = n / sum(n),
+         pctlabel = paste0(round(pct*100), "%"))
+
 # Important note: pay attention to the threshold used by your CO when selecting the syntax (21 cat. vs 28 cat.)
 # Use this when analyzing a country with high consumption of sugar and oil – thresholds 28-42
 
@@ -152,6 +183,11 @@ var_label(df_hh$FCSCat28) <- "FCS Categories"
 
 round(prop.table(table(df_hh$FCSCat28)), 2)
 
+#Weighted
+df_hh %>% group_by(FCSCat28) %>% filter(!is.na(FCSCat28)) %>% 
+  summarise(n = sum(Weight)) %>%
+  mutate(pct = n / sum(n),
+         pctlabel = paste0(round(pct*100), "%"))
 
 # -----------------------------------------------------------------------------
 # LIVELIHOOD COPING STRATEGIES INDEX
@@ -245,6 +281,12 @@ val_lab(df_hh$Max_coping_behaviourEN) = num_lab("
 
 round(prop.table(table(df_hh$Max_coping_behaviourEN)), 2)
 
+#Weighted
+df_hh %>% group_by(Max_coping_behaviourEN) %>% filter(!is.na(Max_coping_behaviourEN)) %>% 
+  summarise(n = sum(Weight)) %>%
+  mutate(pct = n / sum(n),
+         pctlabel = paste0(round(pct*100), "%"))
+
 # -----------------------------------------------------------------------------
 # REDUCED COPING STRATEGIES INDEX
 # -----------------------------------------------------------------------------
@@ -280,12 +322,15 @@ df_hh <- df_hh %>% mutate(rCSI = FS.3.1_NUM_COPE + (2 * FS.3.2_NUM_BURROW) + FS.
 var_label(df_hh$rCSI) <- "Reduced coping strategies index (rCSI)"
 
 
-# Unweighted - rCSI score
+# Unweighted
 rCSI_table_mean <- df_hh %>% 
   drop_na(rCSI) %>% 
   summarise(meanrCSI = mean(rCSI))
 
-print(rCSI_table_mean)
+#Weighted
+rCSI_table_mean <- df_hh %>% 
+  drop_na(rCSI) %>% 
+  summarise(meanrCSI =  weighted.mean(rCSI,Weight))
 
 
 # ------------------------------------------------------------------------------
@@ -370,7 +415,7 @@ df_hh$total_expenditure[na_in_se_columns] <- NA
 # 1. SHARE OF EXPENDITURE ON FOOD
 df_hh$share_food_expenditure <- round(df_hh$SE.2.1_NUM_FOOD / df_hh$total_expenditure,2)
 
-df_hh %>% summarise(average = mean(share_food_expenditure, na.rm = T))
+df_hh %>% summarise(average = weighted.mean(share_food_expenditure,Weight, na.rm = T))
 
 # 2. SHARE OF EXPENDITURE ON ACCOMMODATION
 df_hh$share_accomm_expenditure <- round(df_hh$SE.2.2_NUM_ACCOM / df_hh$total_expenditure,2)
@@ -396,6 +441,8 @@ df_hh$share_debt_expenditure <- round(df_hh$SE.2.9_NUM_DEBT / df_hh$total_expend
 
 # 9. SHARE OF EXPENDITURE ON OTHER
 df_hh$share_other_expenditure <- round(df_hh$SE.2.7_NUM_OTH / df_hh$total_expenditure,2)
+
+
 # ------------------------------------------------------------------------------
 
 # EXPORT THE VARIABLES
@@ -403,12 +450,12 @@ df_hh$share_other_expenditure <- round(df_hh$SE.2.7_NUM_OTH / df_hh$total_expend
 df_hh_export <- df_hh %>%
   select("_index", "FCS","FCSCat21", "stress_coping_EN", "emergency_coping_EN", "crisis_coping_EN", "Max_coping_behaviourEN", "rCSI", "total_expenditure", "share_food_expenditure","share_accomm_expenditure", "share_health_expenditure","share_hygiene_expenditure","share_communication_expenditure","share_hh_bills_expenditure","share_education_expenditure","share_debt_expenditure","share_other_expenditure" ) 
 
-write.xlsx(df_hh_export, "VAM/hh_indicators_czech.xlsx")
+write.xlsx(df_hh_export, "VAM/hh_indicators_moldova.xlsx")
 
 
 df_ind_export <- df_ind %>%
   select("_index","_parent_index","disability") 
 
-write.xlsx(df_ind_export, "VAM/ind_indicators_czech.xlsx")
+write.xlsx(df_ind_export, "VAM/ind_indicators_moldova.xlsx")
 
 

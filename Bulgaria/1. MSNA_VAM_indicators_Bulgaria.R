@@ -1,7 +1,7 @@
+
 ## Clear environment, if needed
 rm(list = ls())
-setwd("/Users/irmasirutyte/Desktop/MSNA Composite/MSNA_updated_czech")
-
+setwd("/Users/irmasirutyte/Desktop/MSNA Composite/MSNA_updated_bulgaria")
 
 ## Libraries
 
@@ -24,15 +24,18 @@ library(writexl)
 library(expss)
 
 
-sheet_names = excel_sheets("Data/2023_Czech_Republic_Multi-Sector_Needs_Assessment.xlsx") # get sheet names
+sheet_names = excel_sheets("Data/bulgaria_multi-sector_needs_assessment_2023_-_latest_version_-_false_-_2023-11-10-08-12-23.xlsx") # get sheet names
 sheet_names # print sheet names
 
 # Read Sheet 1
-df_hh <- read_excel("Data/2023_Czech_Republic_Multi-Sector_Needs_Assessment.xlsx", sheet = "2023 Czech Republic Multi-Se...")
-View(df_hh)
+df_hh <- read_excel("Data/bulgaria_multi-sector_needs_assessment_2023_-_latest_version_-_false_-_2023-11-10-08-12-23.xlsx", 
+                    sheet = "Bulgaria Multi-Sector Needs ...")
+# View(df_hh)
+
 
 # Read Sheet 2
-df_ind <- read_excel("Data/2023_Czech_Republic_Multi-Sector_Needs_Assessment.xlsx", sheet = "Info")
+df_ind <- read_excel("Data/slovakia_msna_2023_cleandata.xlsx", sheet = "Info")
+# View(df_ind)
 
 
 # ------------------------------------------------------------------------------
@@ -86,9 +89,10 @@ df_ind <- df_ind %>%
                             "Without disability" = 0,
                             "With disability" = 1)
   ))
+
 table(df_ind$disability)
 
-round(prop.table(table(df_ind$disability)), 2)
+round(prop.table(table(df_ind$disability)), 3)
 
 
 # -----------------------------------------------------------------------------
@@ -151,7 +155,6 @@ val_lab(df_hh$FCSCat28) = num_lab("
 var_label(df_hh$FCSCat28) <- "FCS Categories"
 
 round(prop.table(table(df_hh$FCSCat28)), 2)
-
 
 # -----------------------------------------------------------------------------
 # LIVELIHOOD COPING STRATEGIES INDEX
@@ -280,12 +283,10 @@ df_hh <- df_hh %>% mutate(rCSI = FS.3.1_NUM_COPE + (2 * FS.3.2_NUM_BURROW) + FS.
 var_label(df_hh$rCSI) <- "Reduced coping strategies index (rCSI)"
 
 
-# Unweighted - rCSI score
+# Unweighted
 rCSI_table_mean <- df_hh %>% 
   drop_na(rCSI) %>% 
   summarise(meanrCSI = mean(rCSI))
-
-print(rCSI_table_mean)
 
 
 # ------------------------------------------------------------------------------
@@ -396,6 +397,8 @@ df_hh$share_debt_expenditure <- round(df_hh$SE.2.9_NUM_DEBT / df_hh$total_expend
 
 # 9. SHARE OF EXPENDITURE ON OTHER
 df_hh$share_other_expenditure <- round(df_hh$SE.2.7_NUM_OTH / df_hh$total_expenditure,2)
+
+
 # ------------------------------------------------------------------------------
 
 # EXPORT THE VARIABLES
@@ -403,12 +406,12 @@ df_hh$share_other_expenditure <- round(df_hh$SE.2.7_NUM_OTH / df_hh$total_expend
 df_hh_export <- df_hh %>%
   select("_index", "FCS","FCSCat21", "stress_coping_EN", "emergency_coping_EN", "crisis_coping_EN", "Max_coping_behaviourEN", "rCSI", "total_expenditure", "share_food_expenditure","share_accomm_expenditure", "share_health_expenditure","share_hygiene_expenditure","share_communication_expenditure","share_hh_bills_expenditure","share_education_expenditure","share_debt_expenditure","share_other_expenditure" ) 
 
-write.xlsx(df_hh_export, "VAM/hh_indicators_czech.xlsx")
+write.xlsx(df_hh_export, "VAM/hh_indicators_bulgaria.xlsx")
 
 
 df_ind_export <- df_ind %>%
   select("_index","_parent_index","disability") 
 
-write.xlsx(df_ind_export, "VAM/ind_indicators_czech.xlsx")
+write.xlsx(df_ind_export, "VAM/ind_indicators_bulgaria.xlsx")
 
 
