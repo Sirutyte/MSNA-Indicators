@@ -396,12 +396,31 @@ df_hh$share_debt_expenditure <- round(df_hh$SE.2.9_NUM_DEBT / df_hh$total_expend
 
 # 9. SHARE OF EXPENDITURE ON OTHER
 df_hh$share_other_expenditure <- round(df_hh$SE.2.7_NUM_OTH / df_hh$total_expenditure,2)
+
+
+
+
 # ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+
+
+# Calculate quantiles with na.rm = TRUE
+quantiles <- quantile(df_hh$total_expenditure, probs = c(0, 0.2, 0.4, 0.6, 0.8, 1), na.rm = TRUE)
+
+# Assign categories based on quantiles
+df_hh$expenditure_quantiles <- cut(df_hh$total_expenditure, breaks = quantiles, labels = c("Very Low", "Low", "Medium", "High", "Very High"), include.lowest = TRUE)
+
+# Print the result
+head(df_hh)
+
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+
 
 # EXPORT THE VARIABLES
 
 df_hh_export <- df_hh %>%
-  select("_index", "FCS","FCSCat21", "stress_coping_EN", "emergency_coping_EN", "crisis_coping_EN", "Max_coping_behaviourEN", "rCSI", "total_expenditure", "share_food_expenditure","share_accomm_expenditure", "share_health_expenditure","share_hygiene_expenditure","share_communication_expenditure","share_hh_bills_expenditure","share_education_expenditure","share_debt_expenditure","share_other_expenditure" ) 
+  select("_index", "FCS","FCSCat21", "stress_coping_EN", "emergency_coping_EN", "crisis_coping_EN", "Max_coping_behaviourEN", "rCSI", "total_expenditure", "expenditure_quantiles", "share_food_expenditure","share_accomm_expenditure", "share_health_expenditure","share_hygiene_expenditure","share_communication_expenditure","share_hh_bills_expenditure","share_education_expenditure","share_debt_expenditure","share_other_expenditure" ) 
 
 write.xlsx(df_hh_export, "VAM/hh_indicators_czech.xlsx")
 
