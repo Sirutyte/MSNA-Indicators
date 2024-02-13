@@ -619,7 +619,7 @@ round(prop.table(table(df_ind$outcome10_1_measles)), 2)
 df_ind <- df_ind %>%
   mutate(outcome10_1_polio = case_when(
     H6_SS_HLTH_VACCINE_POLIO == "1_dose" | H6_SS_HLTH_VACCINE_POLIO == "2_doses" | H6_SS_HLTH_VACCINE_POLIO == "3_doses" | H6_SS_HLTH_VACCINE_POLIO == "4_doses" ~ 1, 
-    H6_SS_HLTH_VACCINE_POLIO == "0_none"  | H6_SS_HLTH_VACCINE_POLIO == "DoNotKnow" | H6_SS_HLTH_VACCINE_POLIO == "PreferNotAnswer" ~ 0,
+    H6_SS_HLTH_VACCINE_POLIO == "0_none"  | H6_SS_HLTH_VACCINE_POLIO == "dont_know" | H6_SS_HLTH_VACCINE_POLIO == "PreferNotAnswer" ~ 0,
     TRUE ~ NA_real_
   )) %>%
   mutate(outcome10_1_polio = labelled(outcome10_1_polio,
@@ -629,7 +629,7 @@ df_ind <- df_ind %>%
                                         ),
                                         label = "Proportion of children aged 9 months to five years who have received polio vaccination*"))
 
-
+table(df_ind$H6_SS_HLTH_VACCINE_POLIO)
 
 table(df_ind$outcome10_1_polio)
 
@@ -852,7 +852,10 @@ round(prop.table(table(df_hh$protection_services_awareness)), 2)
 # GBV02_SM_GBV_BARR - multi-response question
 # remove GBV02_SM_GBV_BARR_no_need_to_check
 
-df_hh_filtered_gbv <- filter(df_hh, GBV02_SM_GBV_BARR_no_need_to_check != 1)
+df_hh_filtered_gbv <- filter(df_hh, GBV02_SM_GBV_BARR_no_need_to_check != 1 & 
+                               GBV02_SM_GBV_BARR_dont_know != 1 &
+                               GBV02_SM_GBV_BARR_prefer_not_to_answer != 1)
+
 
 df_hh_filtered_gbv %>%
   select(starts_with("GBV02_SM_GBV_BARR")) %>%
