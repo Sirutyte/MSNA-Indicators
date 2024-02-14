@@ -628,7 +628,7 @@ write_xlsx(df_hh, "RMS/final_household_indicators.xlsx", col_names=TRUE)
 df_ind <- df_ind %>%
   mutate(outcome10_1_measles = case_when(
     H5.1_SS_HLTH_VACCINE_MEASLES == "yes" ~ 1, 
-    H5.1_SS_HLTH_VACCINE_MEASLES == "no"  | H5.1_SS_HLTH_VACCINE_MEASLES == "DoNotKnow" | H5.1_SS_HLTH_VACCINE_MEASLES == "PreferNotAnswer" ~ 0,
+    H5.1_SS_HLTH_VACCINE_MEASLES == "no" ~ 0,
     TRUE ~ NA_real_
   )) %>%
   mutate(outcome10_1_measles = labelled(outcome10_1_measles,
@@ -651,7 +651,7 @@ round(prop.table(table(df_ind$outcome10_1_measles)), 2)
 df_ind <- df_ind %>%
   mutate(outcome10_1_polio = case_when(
     H6_SS_HLTH_VACCINE_POLIO == "1_dose" | H6_SS_HLTH_VACCINE_POLIO == "2_doses" | H6_SS_HLTH_VACCINE_POLIO == "3_doses" | H6_SS_HLTH_VACCINE_POLIO == "4_doses" ~ 1, 
-    H6_SS_HLTH_VACCINE_POLIO == "0_none"  | H6_SS_HLTH_VACCINE_POLIO == "DoNotKnow" | H6_SS_HLTH_VACCINE_POLIO == "PreferNotAnswer" ~ 0,
+    H6_SS_HLTH_VACCINE_POLIO == "0_none" ~ 0,
     TRUE ~ NA_real_
   )) %>%
   mutate(outcome10_1_polio = labelled(outcome10_1_polio,
